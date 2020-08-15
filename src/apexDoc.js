@@ -4,10 +4,15 @@ const readline = require('readline');
 
 const ClassGroup = require('./classGroup.js');
 const ClassModel = require('./classModel.js');
+const MethodModel = require('./methodModel.js');
+const PropertyModel = require('./propertyModel.js');
 
 class ApexDoc {
     constructor(sourceDirectory) {
         this.sourceDirectory = sourceDirectory;
+        this.rgstrScope = [];
+        this.rgstrArgs = [];
+        this.fm = "";
     }
 
     runApexDocs() {
@@ -181,8 +186,8 @@ class ApexDoc {
             }
 
             // keep track of our nesting so we know which class we are in
-            let openCurlies = countChars(strLine, '{');
-            let closeCurlies = countChars(strLine, '}');
+            let openCurlies = this.countChars(strLine, '{');
+            let closeCurlies = this.countChars(strLine, '}');
             nestedCurlyBraceDepth += openCurlies;
             nestedCurlyBraceDepth -= closeCurlies;
 
@@ -286,9 +291,9 @@ class ApexDoc {
 
     strContainsScope(str) {
         str = str.toLowerCase();
-        for (let i = 0; i < rgstrScope.length; i++) {
-            if (str.toLowerCase().contains(rgstrScope[i].toLowerCase() + " ")) {
-                return rgstrScope[i];
+        for (let i = 0; i < this.rgstrScope.length; i++) {
+            if (str.toLowerCase().contains(this.rgstrScope[i].toLowerCase() + " ")) {
+                return this.rgstrScope[i];
             }
         }
         return null;
@@ -532,7 +537,7 @@ class ApexDoc {
     }
 
     countChars(str, ch) {
-        count = 0;
+        let count = 0;
         for (let i = 0; i < str.length; ++i) {
             if (str.charAt(i) === ch) {
                 ++count;
