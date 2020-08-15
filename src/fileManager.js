@@ -381,12 +381,12 @@ class FileManager {
         return links;
     }
 
-    //TODO: Implement file copying
-    docopy(source, target) {
+    docopy(sourceDirectory,source, target) {
         let contents = "";
+        const filePath = path.resolve(sourceDirectory,source);
 
         const fileStreamByLines = readline.createInterface({
-            input: fs.createReadStream(source),
+            input: fs.createReadStream(filePath),
             output: process.stdout,
             terminal: false
         });
@@ -403,13 +403,13 @@ class FileManager {
     }
 
     copy(toFileName) {
-        docopy("apex_doc_logo.png", toFileName);
-        docopy("ApexDoc.css", toFileName);
-        docopy("ApexDoc.js", toFileName);
-        docopy("CollapsibleList.js", toFileName);
-        docopy("jquery-1.11.1.js", toFileName);
-        docopy("toggle_block_btm.gif", toFileName);
-        docopy("toggle_block_stretch.gif", toFileName);
+        docopy("../resources","apex_doc_logo.png", toFileName);
+        docopy("../resources","ApexDoc.css", toFileName);
+        docopy("../resources","ApexDoc.js", toFileName);
+        docopy("../resources","CollapsibleList.js", toFileName);
+        docopy("../resources","jquery-1.11.1.js", toFileName);
+        docopy("../resources","toggle_block_btm.gif", toFileName);
+        docopy("../resources","toggle_block_stretch.gif", toFileName);
     }
 
     getFiles(path) {
