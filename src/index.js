@@ -1,4 +1,4 @@
 const ApexDoc = require('./apexDoc.js');
 
-const apexDocEngine = new ApexDoc("TestDirectory");
+const apexDocEngine = new ApexDoc('./');
 apexDocEngine.runApexDocs();

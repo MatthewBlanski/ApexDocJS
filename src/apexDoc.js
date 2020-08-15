@@ -1,6 +1,7 @@
-const ApexModel = require('./apexModel.js');
-const ClassModel = require('./classModel.js');
-const fs = require('fs');
+const ApexModel = require("./apexModel.js");
+const ClassModel = require("./classModel.js");
+const fs = require("fs");
+const path = require("path");
 
 class ApexDoc {
     constructor(sourceDirectory) {
@@ -10,31 +11,32 @@ class ApexDoc {
     runApexDocs() {
         const registeredScope = ["global","public","webService"];
 
-        //get all files recursively!
-        const filesArray = this.getFilesFromDirectory();
-        //sourceDirectory.readSync();
+        const filesArray = this.getFilesFromDirectory(this.sourceDirectory);
+        console.log(JSON.stringify(filesArray));
+
         //Create a new array of ClassModels
         const classModels = this.getClassModelsFromFiles(filesArray);
-        const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
+        //const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
-        const projectDetail;//fm.parseHTMLFile(authorfilepath);
-        const homeContents;//fm.parseHTMLFile(homefilepath);
+        //const projectDetail;//fm.parseHTMLFile(authorfilepath);
+        //const homeContents;//fm.parseHTMLFile(homefilepath);
         //fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, hostedSourceURL);
         console.log("ApexDoc has completed!");
     }
 
-    getFilesFromDirectory(sourceDirectory) {
+    getFilesFromDirectory(directoryName) {
         let filesArray = [];
-        //TODO: test access with fs.accessSync(sourceDirectory,fs.constants.R_OK)
-        const directory = fs.readdirSync(sourceDirectory,{'utf8',true});
+
+        const directory = fs.readdirSync(directoryName,{encoding:"utf8",withFileTypes:true});
 
         directory.forEach((directoryEntry) => {
             if(directoryEntry.isFile()) {
-                if(directoryEntry.name.endsWith(".cls")) {
-                    filesArray.push(directoryEntry);
+                if(directoryEntry.name.endsWith(".js")) {
+                    filesArray.push(path.resolve(directoryName, directoryEntry.name));
                 }
             } else if (directoryEntry.isDirectory()) {
-                //TODO: Include code to recurse directories for this for support for dx format
+                let subArray = this.getFilesFromDirectory( path.resolve(directoryName, directoryEntry.name) );
+                filesArray = filesArray.concat(subArray);
             }
         });
 
@@ -44,9 +46,9 @@ class ApexDoc {
     getClassModelsFromFiles(filesArray) {
         let classModels = [];
 
-        filesArray.forEach((file,classModels) => {
+        filesArray.forEach((filePath) => {
             //get absolute path of file
-            const classModel = this.parseFileContents(file);
+            const classModel = this.parseFileContents(filePath);
 
             if(classModel) {
                 classModels.push(classModel);
@@ -56,12 +58,15 @@ class ApexDoc {
         return classModels;
     }
 
-    createMapGroupNameToClassGroup(classModels, sourceDirectory) {
-        //Get all files from the source directory
-        raw = fs.readFileSync(filePath, 'utf8');
+    parseFileContents(filePath) {
+        let file = fs.readFileSync(filePath,{flag:"r"});
+        console.log("file read!");
     }
 
-    parseFileContents() {}
+    createMapGroupNameToClassGroup(classModels, sourceDirectory) {
+        //Get all files from the source directory
+        raw = fs.readFileSync(filePath, "utf8");
+    }
 }
 
 module.exports = ApexDoc;
