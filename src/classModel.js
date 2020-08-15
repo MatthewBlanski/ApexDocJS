@@ -1,0 +1,4 @@
+class ClassModel {
+    constructor() {
+    }
+}
