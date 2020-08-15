@@ -1,8 +1,9 @@
-const ApexModel = require('./apexModel.js');
-const ClassModel = require('./classModel.js');
 const fs = require('fs');
 const path = require('path');
 const readline = require('readline');
+
+const ClassGroup = require('./classGroup.js');
+const ClassModel = require('./classModel.js');
 
 class ApexDoc {
     constructor(sourceDirectory) {
