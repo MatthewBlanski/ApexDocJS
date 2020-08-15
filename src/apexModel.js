@@ -75,7 +75,21 @@ class ApexModel {
         this.scope = null;
 
         if(this.nameLine) {
+            let str = this.strContainsScope(nameLine);
+            if (str) {
+                scope = str;
+            }
             this.scope = nameLine;
         }
+    }
+
+    strContainsScope(str) {
+        str = str.toLowerCase();
+        for (let i = 0; i < rgstrScope.length; i++) {
+            if (str.toLowerCase().contains(rgstrScope[i].toLowerCase() + " ")) {
+                return rgstrScope[i];
+            }
+        }
+        return null;
     }
 }
