@@ -65,7 +65,7 @@ class ApexModel {
 
     getValueOrEmptyString(value) {
         if(!value) {
-            return "";
+            return '';
         }
 
         return value;
