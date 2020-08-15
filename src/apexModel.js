@@ -93,3 +93,5 @@ class ApexModel {
         return null;
     }
 }
+
+module.exports = ApexModel;
