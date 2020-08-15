@@ -1,0 +1,19 @@
+{
+  "name": "apexdocjs",
+  "version": "1.0.0",
+  "description": "A node app to document Salesforce Apex classes.",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/MatthewBlanski/ApexDocJS.git"
+  },
+  "author": "Matthew Blanski",
+  "license": "BSD-3-Clause",
+  "bugs": {
+    "url": "https://github.com/MatthewBlanski/ApexDocJS/issues"
+  },
+  "homepage": "https://github.com/MatthewBlanski/ApexDocJS#readme"
+}
