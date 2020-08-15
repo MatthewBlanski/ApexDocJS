@@ -6,17 +6,20 @@ const ClassGroup = require('./classGroup.js');
 const ClassModel = require('./classModel.js');
 const MethodModel = require('./methodModel.js');
 const PropertyModel = require('./propertyModel.js');
+const FileManager = require('./fileManager.js');
 
 class ApexDoc {
     constructor(sourceDirectory) {
         this.sourceDirectory = sourceDirectory;
-        this.rgstrScope = [];
+        this.targetDirectory = "../"
+        this.rgstrScope = ['global','public','webService'];
         this.rgstrArgs = [];
-        this.fm = "";
+        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
+        this.hostedSourceUrl = "";//TODO include calculation for this
     }
 
     runApexDocs() {
-        const registeredScope = ['global','public','webService'];
+        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
 
         const filesArray = this.getFilesFromDirectory(this.sourceDirectory);
         console.log(JSON.stringify(filesArray));
@@ -26,9 +29,9 @@ class ApexDoc {
         const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
         //TODO: Add resolve HTML and file creation
-        //const projectDetail;//fm.parseHTMLFile(authorfilepath);
-        //const homeContents;//fm.parseHTMLFile(homefilepath);
-        //fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, hostedSourceURL);
+        const projectDetail = this.fm.parseHTMLFile(authorfilepath);
+        const homeContents; this.fm.parseHTMLFile(homefilepath);
+        fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, hostedSourceURL);
         console.log('ApexDoc has completed!');
     }
 
@@ -103,7 +106,6 @@ class ApexDoc {
     }
 
     parseFileContents(filePath) {
-        let strLine;
         let commentsStarted = false;
         let docBlockStarted = false;
         let nestedCurlyBraceDepth = 0;

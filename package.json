@@ -15,5 +15,8 @@
   "bugs": {
     "url": "https://github.com/MatthewBlanski/ApexDocJS/issues"
   },
-  "homepage": "https://github.com/MatthewBlanski/ApexDocJS#readme"
+  "homepage": "https://github.com/MatthewBlanski/ApexDocJS#readme",
+  "dependencies": {
+    "escape-html": "^1.0.3"
+  }
 }
