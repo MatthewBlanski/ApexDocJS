@@ -8,7 +8,7 @@ class Constants {
         "</head>" +
         "<body>";
 
-        this.String HEADER_CLOSE =                                                                               
+        this.HEADER_CLOSE =                                                                               
         "</td>" +
         "</tr>" +
         "</table>" +
@@ -43,7 +43,7 @@ class Constants {
             header = Constants.HEADER_OPEN + Constants.PROJECT_DETAIL + Constants.HEADER_CLOSE;
         }
         return header;
-    }    
+    }
 }
 
 module.exports = Constants;
