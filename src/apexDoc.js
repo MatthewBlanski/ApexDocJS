@@ -17,8 +17,9 @@ class ApexDoc {
 
         //Create a new array of ClassModels
         const classModels = this.getClassModelsFromFiles(filesArray);
-        //const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
+        const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
+        //TODO: Add resolve HTML and file creation
         //const projectDetail;//fm.parseHTMLFile(authorfilepath);
         //const homeContents;//fm.parseHTMLFile(homefilepath);
         //fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, hostedSourceURL);
@@ -42,6 +43,42 @@ class ApexDoc {
         });
 
         return filesArray;
+    }
+
+    printHelp() {
+        console.log("ApexDoc - a tool for generating documentation from Salesforce Apex code class files.\n");
+        console.log("    Invalid Arguments detected.  The correct syntax is:\n");
+        console.log("apexdoc -s <source_directory> [-t <target_directory>] [-g <source_url>] [-h <homefile>] [-a <authorfile>] [-p <scope>]\n");
+        console.log("<source_directory> - The folder location which contains your apex .cls classes");
+        console.log("<target_directory> - Optional. Specifies your target folder where documentation will be generated.");
+        console.log("<source_url> - Optional. Specifies a URL where the source is hosted (so ApexDoc can provide links to your source).");
+        console.log("<homefile> - Optional. Specifies the html file that contains the contents for the home page\'s content area.");
+        console.log("<authorfile> - Optional. Specifies the text file that contains project information for the documentation header.");
+        console.log("<scope> - Optional. Semicolon seperated list of scopes to document.  Defaults to 'global;public'. ");
+    }
+
+    createMapGroupNameToClassGroup(cModels,sourceDirectory) {
+        let map = new Map();
+        cModels.forEach((cmodel) => {
+            let strGroup = cmodel.getClassGroup();
+            let strGroupContent = cmodel.getClassGroupContent();
+            if (strGroupContent) {
+                strGroupContent = sourceDirectory + "/" + strGroupContent;
+            }
+            let cg;
+            if (strGroup) {
+                cg = map.get(strGroup);
+                if (!cg) {
+                    cg = new ClassGroup(strGroup, strGroupContent);
+                } else if (!cg.getContentSource()) {
+                    cg.setContentSource(strGroupContent);
+                }
+                // put the new or potentially modified ClassGroup back in the map
+                map.set(strGroup, cg);
+            }
+        });
+
+        return map;
     }
 
     getClassModelsFromFiles(filesArray) {
@@ -87,7 +124,7 @@ class ApexDoc {
                     return;
                 }
 
-                MethodModel mModel = new MethodModel();
+                let mModel = new MethodModel();
                 this.fillMethodModel(mModel, combinedMethodLine, lstComments, iLine);
                 cModel.getMethods().add(mModel);
                 lstComments.clear();
@@ -175,15 +212,21 @@ class ApexDoc {
             // ignore lines not dealing with scope
             if (!this.strContainsScope(strLine) &&
                     // interface methods don't have scope
-                    !(cModel && cModel.getIsInterface() && strLine.contains('('))) {
+                !(cModel &&
+                    cModel.getIsInterface()
+                    && strLine.contains('(')
+                )
+            ) {
                 return;
             }
 
             // look for a class
-            if ((strLine.toLowerCase().contains(' class ') || strLine.toLowerCase().contains(' interface '))) {
+            if (strLine.toLowerCase().contains(' class ') ||
+                strLine.toLowerCase().contains(' interface ')
+            ) {
 
                 // create the new class
-                ClassModel cModelNew = new ClassModel(cModelParent);
+                let cModelNew = new ClassModel(cModelParent);
                 this.fillClassModel(cModelParent, cModelNew, strLine, lstComments, iLine);
                 lstComments.clear();
 
@@ -197,8 +240,7 @@ class ApexDoc {
                 // add it to its parent (or track the parent)
                 if (cModelParent) {
                     cModelParent.addChildClass(cModelNew);
-                }
-                else {
+                } else {
                     cModelParent = cModelNew;
                 }
 
@@ -212,8 +254,8 @@ class ApexDoc {
                     combinedMethodLine = strLine;
                     return;
                 }
-                MethodModel mModel = new MethodModel();
-                fillMethodModel(mModel, strLine, lstComments, iLine);
+                let mModel = new MethodModel();
+                this.fillMethodModel(mModel, strLine, lstComments, iLine);
                 cModel.getMethods().add(mModel);
                 lstComments.clear();
                 return;
@@ -231,7 +273,7 @@ class ApexDoc {
             }
 
             // must be a property
-            PropertyModel propertyModel = new PropertyModel();
+            let propertyModel = new PropertyModel();
             this.fillPropertyModel(propertyModel, strLine, lstComments, iLine);
             cModel.getProperties().add(propertyModel);
             lstComments.clear();
@@ -241,9 +283,9 @@ class ApexDoc {
         return cModelParent;
     }
 
-    public static String strContainsScope(String str) {
+    strContainsScope(str) {
         str = str.toLowerCase();
-        for (int i = 0; i < rgstrScope.length; i++) {
+        for (let i = 0; i < rgstrScope.length; i++) {
             if (str.toLowerCase().contains(rgstrScope[i].toLowerCase() + " ")) {
                 return rgstrScope[i];
             }
@@ -251,60 +293,60 @@ class ApexDoc {
         return null;
     }
 
-    private static void fillPropertyModel(PropertyModel propertyModel, String name, ArrayList<String> lstComments,
-            int iLine) {
+    fillPropertyModel(propertyModel, name, lstComments, iLine) {
         propertyModel.setNameLine(name, iLine);
-        boolean inDescription = false;
-        int i = 0;
-        for (String comment : lstComments) {
+        let inDescription = false;
+        let i = 0;
+        lstComments.forEach((comment) => {
         	i++;
             comment = comment.trim();
-            int idxStart = comment.toLowerCase().indexOf("@description");
-            if (idxStart != -1 || i == 1) {
-            	if (idxStart != -1 && comment.length() > idxStart + 13)
-            		propertyModel.setDescription(comment.substring(idxStart + 13).trim());
-            	else{
-                	Pattern p = Pattern.compile("\\s");
-                	Matcher m = p.matcher(comment);
-                	if (m.find()) {
-                		propertyModel.setDescription(comment.substring(m.start()).trim());
+            let idxStart = comment.toLowerCase().indexOf("@description");
+            if (idxStart != -1 || i === 1) {
+            	if (idxStart != -1 && comment.length() > idxStart + 13) {
+                    propertyModel.setDescription(comment.substring(idxStart + 13).trim());
+                } else {
+                    //TODO - Confirm this is identical
+                    let mStart = comment.indexOf('\\s')
+                	if (mStart != -1) {
+                		propertyModel.setDescription(comment.substring(mStart).trim());
                 	}
                 }
                 inDescription = true;
-                continue;
+                return;
             }
 
             // handle multiple lines for description.
             if (inDescription) {
-                int j;
+                let j;
                 for (j = 0; j < comment.length(); j++) {
-                    char ch = comment.charAt(j);
-                    if (ch != '*' && ch != ' ')
+                    const ch = comment.charAt(j);
+                    if (ch != '*' && ch != ' ') {
                         break;
+                    }
                 }
-                if (j < comment.length()) {
+                if (j < comment.length) {
                     propertyModel.setDescription(propertyModel.getDescription() + ' ' + comment.substring(j));
                 }
-                continue;
+                return;
             }
-        }
+        });
     }
 
-    private static void fillMethodModel(MethodModel mModel, String name, ArrayList<String> lstComments, int iLine) {
+    fillMethodModel(mModel, name, lstComments, iLine) {
         mModel.setNameLine(name, iLine);
-        boolean inDescription = false;
-        boolean inExample = false;
-        int i = 0;
-        for (String comment : lstComments) {
+        let inDescription = false;
+        let inExample = false;
+        let i = 0;
+        lstComments.forEach((comment) => {
         	i++;
             comment = comment.trim();
 
-            int idxStart = comment.toLowerCase().indexOf("@author");
+            let idxStart = comment.toLowerCase().indexOf("@author");
             if (idxStart != -1) {
                 mModel.setAuthor(comment.substring(idxStart + 8).trim());
                 inDescription = false;
                 inExample = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@date");
@@ -312,7 +354,7 @@ class ApexDoc {
                 mModel.setDate(comment.substring(idxStart + 5).trim());
                 inDescription = false;
                 inExample = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@return");
@@ -320,7 +362,7 @@ class ApexDoc {
                 mModel.setReturns(comment.substring(idxStart + 7).trim());
                 inDescription = false;
                 inExample = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@param");
@@ -328,183 +370,170 @@ class ApexDoc {
                 mModel.getParams().add(comment.substring(idxStart + 6).trim());
                 inDescription = false;
                 inExample = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@description");
-            if (idxStart != -1 || i == 1) {
+            if (idxStart != -1 || i === 1) {
                 if (idxStart != -1 && comment.length() >= idxStart + 12)
                     mModel.setDescription(comment.substring(idxStart + 12).trim());
                 else{
-                	Pattern p = Pattern.compile("\\s");
-                	Matcher m = p.matcher(comment);
-                	if (m.find()) {
-                		mModel.setDescription(comment.substring(m.start()).trim());
+                    //TODO - Confirm this is identical
+                    let mStart = comment.indexOf('\\s')
+                	if (mStart != -1) {
+                		mModel.setDescription(comment.substring(mStart).trim());
                 	}
                 }
                 inDescription = true;
                 inExample = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@example");
-            if (idxStart != -1 || i == 1) {
+            if (idxStart != -1 || i === 1) {
                 if (idxStart != -1 && comment.length() >= idxStart + 8) {
                     mModel.setExample(comment.substring(idxStart + 8).trim());
                 } else {
-                	Pattern p = Pattern.compile("\\s");
-                	Matcher m = p.matcher(comment.substring(8));
-
-                	if (m.find()) {
-                		mModel.setExample(comment.substring(m.start()).trim());
+                    //TODO - Confirm this is identical
+                    let mStart = comment.indexOf('\\s')
+                	if (mStart != -1) {
+                		mModel.setExample(comment.substring(mStart).trim());
                 	}
                 }
                 inDescription = false;
                 inExample = true;
-                continue;
+                return;
             }
 
             // handle multiple lines for @description and @example.
             if (inDescription || inExample) {
-                int j;
+                let j;
                 for (j = 0; j < comment.length(); j++) {
-                    char ch = comment.charAt(j);
-                    if (ch != '*' && ch != ' ')
+                    let ch = comment.charAt(j);
+                    if (ch != '*' && ch != ' ') {
                         break;
+                    }
                 }
-                if (j < comment.length()) {
+                if (j < comment.length) {
                     if (inDescription) {
                         mModel.setDescription(mModel.getDescription() + ' ' + comment.substring(j));
                     } else if (inExample) {
                         // Lets's not include the tag
-                        if (j == 0 && comment.substring(2, 10) == "* @example") {
+                        if (j === 0 && comment.substring(2, 10) === "* @example") {
                             comment = comment.substring(10);
                         }
 
                         mModel.setExample(mModel.getExample()
-                            + (mModel.getExample().trim().length() == 0 ? "" : "\n")
+                            + (mModel.getExample().trim().length() === 0 ? "" : "\n")
                             + comment.substring(2));
                     }
                 }
-                continue;
+                return;
             }
-        }
+        });
     }
 
-    private static void fillClassModel(ClassModel cModelParent, ClassModel cModel, String name,
-            ArrayList<String> lstComments, int iLine) {
+    fillClassModel(cModelParent, cModel, name, lstComments, iLine) {
         cModel.setNameLine(name, iLine);
-        if (name.toLowerCase().contains(" interface "))
+        if (name.toLowerCase().contains(" interface ")) {
             cModel.setIsInterface(true);
-        boolean inDescription = false;
-        int i = 0;
-        for (String comment : lstComments) {
+        }
+        let inDescription = false;
+        let i = 0;
+        lstComments.forEach((comment) => {
         	i++;
             comment = comment.trim();
 
-            int idxStart = comment.toLowerCase().indexOf("@author");
+            let idxStart = comment.toLowerCase().indexOf("@author");
             if (idxStart != -1) {
                 cModel.setAuthor(comment.substring(idxStart + 7).trim());
                 inDescription = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@date");
             if (idxStart != -1) {
                 cModel.setDate(comment.substring(idxStart + 5).trim());
                 inDescription = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@group "); // needed to include space to not match group-content.
             if (idxStart != -1) {
                 cModel.setClassGroup(comment.substring(idxStart + 6).trim());
                 inDescription = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@group-content");
             if (idxStart != -1) {
                 cModel.setClassGroupContent(comment.substring(idxStart + 14).trim());
                 inDescription = false;
-                continue;
+                return;
             }
 
             idxStart = comment.toLowerCase().indexOf("@description");
-            if (idxStart != -1 || i == 1) {
+            if (idxStart != -1 || i === 1) {
             	if (idxStart != -1 && comment.length() > idxStart + 13)
             		cModel.setDescription(comment.substring(idxStart + 12).trim());
             	else{
-                	Pattern p = Pattern.compile("\\s");
-                	Matcher m = p.matcher(comment);
-                	if (m.find()) {
-                		cModel.setDescription(comment.substring(m.start()).trim());
+                    //TODO - Confirm this is identical
+                    let mStart = comment.indexOf('\\s')
+                	if (mStart != -1) {
+                		cModel.setDescription(comment.substring(mStart).trim());
                 	}
                 }
                 inDescription = true;
-                continue;
+                return;
             }
 
             // handle multiple lines for description.
             if (inDescription) {
-                int j;
-                for (j = 0; j < comment.length(); j++) {
-                    char ch = comment.charAt(j);
-                    if (ch != '*' && ch != ' ')
+                let j;
+                for (j = 0; j < comment.length; j++) {
+                    let ch = comment.charAt(j);
+                    if (ch != '*' && ch != ' ') {
                         break;
+                    }
                 }
-                if (j < comment.length()) {
+                if (j < comment.length) {
                     cModel.setDescription(cModel.getDescription() + ' ' + comment.substring(j));
                 }
-                continue;
+                return;
             }
-        }
+        });
     }
 
-    /*************************************************************************
-     * strPrevWord
-     *
-     * @param str
-     *            - string to search
-     * @param iSearch
-     *            - where to start searching backwards from
-     * @return - the previous word, or null if none found.
-     */
-    public static String strPrevWord(String str, int iSearch) {
-        if (str == null)
+    strPrevWord(str, iSearch) {
+        if (!str || iSearch >= str.length) {
             return null;
-        if (iSearch >= str.length())
-            return null;
+        }
 
-        int iStart;
-        int iEnd;
-        for (iStart = iSearch - 1, iEnd = 0; iStart >= 0; iStart--) {
-            if (iEnd == 0) {
-                if (str.charAt(iStart) == ' ')
+        let iStart;
+        let iEnd = 0;
+        for (iStart = iSearch - 1; iStart >= 0; iStart--) {
+            if (iEnd === 0) {
+                if (str.charAt(iStart) === ' ') {
                     continue;
+                }
                 iEnd = iStart + 1;
-            } else if (str.charAt(iStart) == ' ') {
+            } else if (str.charAt(iStart) === ' ') {
                 iStart++;
                 break;
             }
         }
 
-        if (iStart == -1)
+        if (iStart === -1) {
             return null;
-        else
+        } else {
             return str.substring(iStart, iEnd);
+        }
     }
 
-    /*************************************************************************
-     * @description Count the number of occurrences of character in the string
-     * @param str
-     * @param ch
-     * @return int
-     */
-    private static int countChars(String str, char ch) {
-        int count = 0;
-        for (int i = 0; i < str.length(); ++i) {
-            if (str.charAt(i) == ch) {
+    countChars(str, ch) {
+        count = 0;
+        for (let i = 0; i < str.length; ++i) {
+            if (str.charAt(i) === ch) {
                 ++count;
             }
         }
