@@ -370,21 +370,19 @@ class FileManager {
 
     docopy(sourceDirectory,source,target) {
         const filePath = path.resolve(sourceDirectory,source);
-
         let file = fs.readFileSync(filePath);
         let resolvedFileName = path.resolve(target, source);
-        console.log('copying ' + filePath + ' to' + resolvedFileName);
         fs.writeFileSync(resolvedFileName,file);
     }
 
     copy(toFileName) {
-        docopy("../resources","apex_doc_logo.png", toFileName);
-        docopy("../resources","ApexDoc.css", toFileName);
-        docopy("../resources","ApexDoc.js", toFileName);
-        docopy("../resources","CollapsibleList.js", toFileName);
-        docopy("../resources","jquery-1.11.1.js", toFileName);
-        docopy("../resources","toggle_block_btm.gif", toFileName);
-        docopy("../resources","toggle_block_stretch.gif", toFileName);
+        this.docopy("./resources","apex_doc_logo.png", toFileName);
+        this.docopy("./resources","ApexDoc.css", toFileName);
+        this.docopy("./resources","ApexDoc.js", toFileName);
+        this.docopy("./resources","CollapsibleList.js", toFileName);
+        this.docopy("./resources","jquery-1.11.1.js", toFileName);
+        this.docopy("./resources","toggle_block_btm.gif", toFileName);
+        this.docopy("./resources","toggle_block_stretch.gif", toFileName);
     }
 
     getFiles(path) {
