@@ -131,6 +131,14 @@ class ClassModel extends ApexModel{
     setIsInterface(isInterface) {
         this.isInterface = isInterface;
     }
+
+    getRelativeFilePath() {
+        return this.relativeFilePath;
+    }
+
+    setRelativeFilePath(relativeFilePath) {
+        this.relativeFilePath = relativeFilePath;
+    }
 }
 
 module.exports = ClassModel;

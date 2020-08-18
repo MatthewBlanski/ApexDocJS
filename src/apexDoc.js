@@ -9,10 +9,10 @@ const FileManager = require('./fileManager.js');
 
 class ApexDoc {
     constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,rgstrArgs,hostedSourceUrl) {
-        this.sourceDirectory = sourceDirectory;
-        this.targetDirectory = targetDirectory;
-        this.authorFilePath = authorFilePath;
-        this.homefilepath = homefilepath;
+        this.sourceDirectory = path.resolve(sourceDirectory);
+        this.targetDirectory = path.resolve(targetDirectory);
+        this.authorFilePath = path.resolve(authorFilePath);
+        this.homefilepath = path.resolve(homefilepath);
 
         if(rgstrScope) {
             this.rgstrScope = rgstrScope;
@@ -242,7 +242,7 @@ class ApexDoc {
 
                     // create the new class
                     let cModelNew = new ClassModel(cModelParent, this.rgstrScope);
-                    this.fillClassModel(cModelParent, cModelNew, strLine, lstComments, iLine);
+                    this.fillClassModel(cModelNew, strLine, filePath, lstComments,  iLine);
                     lstComments = [];
 
                     // keep track of the new class, as long as it wasn't a single liner {}
@@ -452,11 +452,16 @@ class ApexDoc {
         });
     }
 
-    fillClassModel(cModelParent, cModel, name, lstComments, iLine) {
+    fillClassModel(cModel, name, filePath, lstComments, iLine) {
         cModel.setNameLine(name, iLine);
         if (name.toLowerCase().includes(" interface ")) {
             cModel.setIsInterface(true);
         }
+        
+        cModel.setRelativeFilePath(
+            filePath.replace(this.sourceDirectory,'')
+        );
+
         let inDescription = false;
         let i = 0;
         lstComments.forEach((comment) => {

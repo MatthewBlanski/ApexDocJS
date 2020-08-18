@@ -47,9 +47,12 @@ class FileManager {
         return false;
     }
 
-    strLinkfromModel(model, strClassName, hostedSourceURL) {
-        return "<a target='_blank' class='hostedSourceLink' href='" + hostedSourceURL + strClassName + ".cls#L"
-                + model.getInameLine() + "'>";
+    strLinkfromModel(model, cModel, hostedSourceURL, filePath) {
+        return "<a target='_blank' class='hostedSourceLink' href='" +
+                hostedSourceURL +
+                cModel.getRelativeFilePath() +
+                "#L" +
+                model.getInameLine() + "'>";
     }
 
     strHTMLScopingPanel() {
@@ -131,12 +134,12 @@ class FileManager {
     htmlForClassModel(cModel, hostedSourceURL) {
         let contents = "";
         contents += "<h2 class='section-title'>" +
-                this.strLinkfromModel(cModel, cModel.getTopmostClassName(), hostedSourceURL) +
+                this.strLinkfromModel(cModel, cModel, hostedSourceURL) +
                 cModel.getClassName() + "</a>" +
                 "</h2>";
 
         contents += "<div class='classSignature'>" +
-                this.strLinkfromModel(cModel, cModel.getTopmostClassName(), hostedSourceURL) +
+                this.strLinkfromModel(cModel, cModel, hostedSourceURL) +
                 this.escapeHTML(cModel.getNameLine()) + "</a></div>";
 
         //TODO: Confirm this is functional in JS
@@ -162,7 +165,7 @@ class FileManager {
                 contents += "<tr class='propertyscope" + prop.getScope() + "'><td class='clsPropertyName'>" +
                         prop.getPropertyName() + "</td>";
                 contents += "<td><div class='clsPropertyDeclaration'>" +
-                        this.strLinkfromModel(prop, cModel.getTopmostClassName(), hostedSourceURL) +
+                        this.strLinkfromModel(prop, cModel, hostedSourceURL) +
                         this.escapeHTML(prop.getNameLine()) + "</a></div>";
                 contents += "<div class='clsPropertyDescription'>" + this.escapeHTML(prop.getDescription()) + "</div></tr>";
             });
@@ -196,7 +199,7 @@ class FileManager {
                 contents += "<h2 class='methodHeader'><a id='" + method.getMethodName() + "'/>"
                         + method.getMethodName() + "</h2>" +
                         "<div class='methodSignature'>" +
-                        this.strLinkfromModel(method, cModel.getTopmostClassName(), hostedSourceURL) +
+                        this.strLinkfromModel(method, cModel, hostedSourceURL) +
                         this.escapeHTML(method.getNameLine()) + "</a></div>";
 
                 if (method.getDescription() != "") {
@@ -360,8 +363,8 @@ class FileManager {
 
     docopy(sourceDirectory,source,target) {
         const filePath = path.resolve(sourceDirectory,source);
-        let file = fs.readFileSync(filePath);
-        let resolvedFileName = path.resolve(target, source);
+        const file = fs.readFileSync(filePath);
+        const resolvedFileName = path.resolve(target, source);
         fs.writeFileSync(resolvedFileName,file);
     }
 
@@ -376,7 +379,6 @@ class FileManager {
     }
 
     getFiles(path) {
-        //TODO: Confirm this is fully functional and matches. Returns a path array!
         const folder = fs.readdirSync(path,{encoding:'utf8',withFileTypes:true});
         let listOfFilesToCopy = [];
 
