@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
 
 const escapeHtml = require('escape-html');
 
@@ -390,21 +389,9 @@ class FileManager {
         let contents = "";
         const filePath = path.resolve(sourceDirectory,source);
 
-        const fileStreamByLines = readline.createInterface({
-            input: fs.createReadStream(filePath),
-            output: process.stdout,
-            terminal: false
-        });
-
-        fileStreamByLines.on('line', (strLine) => {
-            strLine = strLine.trim();
-            if (strLine && strLine.length > 0) {
-                contents += strLine;
-            }
-        });
-
+        let file = fs.readFileSync(filePath);
         let resolvedFileName = path.resolve(target, source);
-        fs.writeFileSync(resolvedFileName,contents);
+        fs.writeFileSync(resolvedFileName,file);
     }
 
     copy(toFileName) {
@@ -446,13 +433,10 @@ class FileManager {
             if (filePath && filePath.trim().length > 0) {
                 let contents = "";
 
-                const fileStreamByLines = readline.createInterface({
-                    input: fs.createReadStream(filePath),
-                    output: process.stdout,
-                    terminal: false
-                });
-        
-                fileStreamByLines.on('line', (strLine) => {
+                let file = fs.readFileSync(filePath,{encoding:'utf8',flag:'r'});
+                let lineArray = file.split("\n");
+
+                lineArray.forEach((strLine) => {
                     strLine = strLine.trim();
                     if (strLine && strLine.length > 0) {
                         contents += strLine;
