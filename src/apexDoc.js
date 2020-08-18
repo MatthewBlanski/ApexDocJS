@@ -13,7 +13,12 @@ class ApexDoc {
         this.targetDirectory = targetDirectory;
         this.authorFilePath = authorFilePath;
         this.homefilepath = homefilepath;
-        this.rgstrScope = rgstrScope;
+
+        if(rgstrScope) {
+            this.rgstrScope = rgstrScope;
+        } else {
+            this.rgstrScope = ['global','public','webService'];
+        }
         //TODO: Consider argument parsing at a higher level
         this.rgstrArgs = rgstrArgs;
         //TODO: Fix this so it uses the full filename path from the classes in the class models
