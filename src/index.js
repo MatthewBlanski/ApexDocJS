@@ -2,7 +2,7 @@ const ApexDoc = require('./apexDoc.js');
 
 //TODO - implement process.argv.slice
 const apexDocEngine = new ApexDoc('/Users/mblanski/Documents/Projects/NPSP',
-    '/Users/mblanski/Documents/Projects/NPSP/ApexDoc',
+    'ApexDoc',
     '',
     './src',
     ['global','public','webService'],
