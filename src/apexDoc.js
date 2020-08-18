@@ -115,7 +115,6 @@ class ApexDoc {
         let cModelParent;
         let cModels = [];
         let combinedMethodLine;
-        let error;
 
         //TODO - get someone better at handling readfiles
         let file = fs.readFileSync(filePath, {encoding:'utf8',flag:'r'});
@@ -126,11 +125,6 @@ class ApexDoc {
         try{
             lineArray.forEach((strLine) => {
                 iLine++;
-
-                //TODO - figure out a better way to handle this
-                if(error) {
-                    return;
-                }
 
                 if(combinedMethodLine) {
                     combinedMethodLine += strLine;
