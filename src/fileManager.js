@@ -10,15 +10,13 @@ class FileManager {
 
     constructor(path,rgstrScope) {
         this.rgstrScope = rgstrScope;
-        this.path = "";
+        console.log('Path set to ' + path);
+        this.path = path;
         this.header = "";
         this.APEX_DOC_PATH = "";
 
         if (!path|| path.trim().length === 0) {
-            this.path = ".";
-        }
-        else {
-            this.path = path;
+            this.path = "./";
         }
     }
 
@@ -29,17 +27,17 @@ class FileManager {
     createHTML(mapFNameToContent) {
         let constants = new Constants();
         try {
-            //TODO: Confirm this is unnecessary due to file path capabilities.
             /*
             if (this.path.endsWith("/") || this.path.endsWith("\\")) {
                 this.path += constants.ROOT_DIRECTORY; // + "/" + fileName + ".html";
             } else {
                 this.path += "/" + constants.ROOT_DIRECTORY; // + "/" + fileName + ".html";
             }*/
-
+            console.log(this.path);
             //Make directory and dependent directories
             if(!fs.existsSync(this.path)) {
-                fs.mkdirSync(this.path,{recursive:true,mode:"0o777"});
+                console.log('Creating directory ' + this.path);
+                fs.mkdirSync(this.path);
             }
 
             let mapKeysArray = Array.from(mapFNameToContent.keys());
@@ -370,11 +368,12 @@ class FileManager {
         return links;
     }
 
-    docopy(sourceDirectory,source, target) {
+    docopy(sourceDirectory,source,target) {
         const filePath = path.resolve(sourceDirectory,source);
 
         let file = fs.readFileSync(filePath);
         let resolvedFileName = path.resolve(target, source);
+        console.log('copying ' + filePath + ' to' + resolvedFileName);
         fs.writeFileSync(resolvedFileName,file);
     }
 
