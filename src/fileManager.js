@@ -47,7 +47,7 @@ class FileManager {
         return false;
     }
 
-    strLinkfromModel(model, cModel, hostedSourceURL, filePath) {
+    strLinkfromModel(model, cModel, hostedSourceURL) {
         return "<a target='_blank' class='hostedSourceLink' href='" +
                 hostedSourceURL +
                 cModel.getRelativeFilePath() +
