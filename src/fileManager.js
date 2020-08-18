@@ -378,8 +378,8 @@ class FileManager {
         this.docopy("./resources","toggle_block_stretch.gif", toFileName);
     }
 
-    getFiles(path) {
-        const folder = fs.readdirSync(path,{encoding:'utf8',withFileTypes:true});
+    getFiles(directoryName) {
+        const folder = fs.readdirSync(directoryName,{encoding:'utf8',withFileTypes:true});
         let listOfFilesToCopy = [];
 
         if (folder) {
@@ -390,7 +390,7 @@ class FileManager {
                     }
                 });
             } else {
-                console.log("WARNING: No files found in directory: " + path);
+                console.log("WARNING: No files found in directory: " + directoryName);
             }
         }
 
