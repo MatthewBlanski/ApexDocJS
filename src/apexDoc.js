@@ -47,7 +47,7 @@ class ApexDoc {
         let filesArray = [];
         
         this.packageDirectories.forEach((directoryName) => {
-            filesArray.concat(this.getFilesFromDirectory(directoryName));
+            filesArray = filesArray.concat(this.getFilesFromDirectory(directoryName));
         });
 
         return filesArray;
