@@ -36,13 +36,11 @@ class Constants {
     }
 
     getHeader(projectDetail) {
-        let header;
         if (projectDetail && projectDetail.trim().length > 0) {
-            header = Constants.HEADER_OPEN + projectDetail;
-        } else {
-            header = Constants.HEADER_OPEN + Constants.PROJECT_DETAIL + Constants.HEADER_CLOSE;
+            return header = this.HEADER_OPEN + projectDetail;
         }
-        return header;
+        console.log(this.HEADER_OPEN + this.PROJECT_DETAIL + this.HEADER_CLOSE);
+        return this.HEADER_OPEN + this.PROJECT_DETAIL + this.HEADER_CLOSE;
     }
 }
 
