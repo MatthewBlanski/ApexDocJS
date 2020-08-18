@@ -75,7 +75,6 @@ class FileManager {
      * @param projectDetail
      * @param homeContents
      * @param hostedSourceURL
-     * @param monitor
      */
     makeFile(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL) {
         const constants = new Constants();
@@ -98,7 +97,7 @@ class FileManager {
         mapFNameToContent.set("index", homeContents);
 
         // create our Class Group content files
-        this.createClassGroupContent(mapFNameToContent, links, projectDetail, mapGroupNameToClassGroup, cModels);
+        this.createClassGroupContent(mapFNameToContent, links, projectDetail, mapGroupNameToClassGroup);
 
         cModels.forEach((cModel) => {
             let contents = links;
@@ -267,7 +266,7 @@ class FileManager {
     }
 
     // create our Class Group content files
-    createClassGroupContent(mapFNameToContent, links, projectDetail, mapGroupNameToClassGroup, cModels) {
+    createClassGroupContent(mapFNameToContent, links, projectDetail, mapGroupNameToClassGroup) {
         const constants = new Constants();
         let mapGroupNameToClassGroupKeysArray = Array.from(mapGroupNameToClassGroup.keys());
         mapGroupNameToClassGroupKeysArray.forEach((strGroup) => {
