@@ -8,12 +8,6 @@ const ClassGroup = require('./classGroup');
 
 class FileManager {
 
-/*    constructor() {
-        this.path = "";
-        this.header = "";
-        this.APEX_DOC_PATH = "";
-    }*/
-
     constructor(path,rgstrScope) {
         this.rgstrScope = rgstrScope;
         this.path = "";
@@ -29,17 +23,10 @@ class FileManager {
     }
 
     escapeHTML(s) {
-        //TODO confirm this is functional. Was stringbuilder
-        /*let out = "";
-        for (let i = 0; i < s.length; i++) {
-            let c = s.charAt(i);
-            out += escapeHtml(c);
-        }
-        return out;*/
         return escapeHtml(s);
     }
 
-    createHTML(mapFNameToContent, monitor) {
+    createHTML(mapFNameToContent) {
         let constants = new Constants();
         try {
             //TODO: Confirm this is unnecessary due to file path capabilities.
@@ -52,17 +39,14 @@ class FileManager {
 
             //Make directory and dependent directories
             if(!fs.existsSync(this.path)) {
-                //TODO: Confirm this is appropriately funcioning with mode
                 fs.mkdirSync(this.path,{recursive:true,mode:"0o777"});
             }
 
             let mapKeysArray = Array.from(mapFNameToContent.keys());
             mapKeysArray.forEach((fileName) => {
-                //TODO: Confirm this is functional
                 let contents = mapFNameToContent.get(fileName);
                 let resolvedFileName = path.resolve(this.path, fileName + ".html");
                 fs.writeFileSync(resolvedFileName,contents);
-                console.log(fileName + " Processed...");
             });
 
             this.copy(this.path);
@@ -211,8 +195,9 @@ class FileManager {
                 contents += "<li class='methodscope" + method.getScope() + "' >";
                 contents += "<a class='methodTOCEntry' href='#" + method.getMethodName() + "'>"
                         + method.getMethodName() + "</a>";
-                if (method.getDescription() != "")
+                if (method.getDescription() != "") {
                     contents += "<div class='methodTOCDescription'>" + method.getDescription() + "</div>";
+                }
                 contents += "</li>";
 
             });
@@ -386,7 +371,6 @@ class FileManager {
     }
 
     docopy(sourceDirectory,source, target) {
-        let contents = "";
         const filePath = path.resolve(sourceDirectory,source);
 
         let file = fs.readFileSync(filePath);
