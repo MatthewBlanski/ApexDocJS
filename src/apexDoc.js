@@ -13,7 +13,7 @@ class ApexDoc {
         this.sourceDirectory = path.resolve(sourceDirectory);
         this.targetDirectory = path.resolve(sourceDirectory,targetDirectory);
         this.authorFilePath = path.resolve(authorFilePath);
-        this.homefilepath = path.resolve(homefilepath);
+        this.homeilepath = path.resolve(homefilepath);
 
         const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
 
@@ -37,7 +37,7 @@ class ApexDoc {
         const classModels = this.getClassModelsFromFiles(filesArray);
         const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
-        const projectDetail = this.fm.parseHTMLFile(this.authorfilepath);
+        const projectDetail = this.fm.parseHTMLFile(this.authorFilePath);
         const homeContents = this.fm.parseHTMLFile(this.homefilepath);
         this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceUrl);
         console.log('ApexDoc has completed!');
