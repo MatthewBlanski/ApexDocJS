@@ -73,6 +73,7 @@ class ApexDoc {
             let strGroup = cmodel.getClassGroup();
             let strGroupContent = cmodel.getClassGroupContent();
             if (strGroupContent) {
+                //TODO: use Path for this instead
                 strGroupContent = sourceDirectory + "/" + strGroupContent;
             }
             let cg;

@@ -316,7 +316,8 @@ class FileManager {
         }
 
         // create a sorted list of ClassGroups
-        let mapGroupNameToClassGroupKeys = Array.from(tm.keys());
+        let mapGroupNameToClassGroupKeys = Array.from(mapGroupNameToClassGroup.keys());
+
         mapGroupNameToClassGroupKeys.forEach((strGroup) => {
             let cg = mapGroupNameToClassGroup.get(strGroup);
 

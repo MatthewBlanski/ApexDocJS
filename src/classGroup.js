@@ -16,8 +16,8 @@ class ClassGroup {
         return this.strContentSource;
     }
 
-    setContentSource(strContent) {
-        this.strContentSource = strContent;
+    setContentSource(strContentSource) {
+        this.strContentSource = strContentSource;
     }
 
     getContentFilename() {
