@@ -3,16 +3,21 @@ const path = require('path');
 
 const ClassGroup = require('./classGroup.js');
 const ClassModel = require('./classModel.js');
+const FileManager = require('./fileManager.js');
 const MethodModel = require('./methodModel.js');
 const PropertyModel = require('./propertyModel.js');
-const FileManager = require('./fileManager.js');
+const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
 
 class ApexDoc {
     constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,rgstrArgs,hostedSourceUrl) {
         this.sourceDirectory = path.resolve(sourceDirectory);
-        this.targetDirectory = path.resolve(targetDirectory);
+        this.targetDirectory = path.resolve(sourceDirectory,targetDirectory);
         this.authorFilePath = path.resolve(authorFilePath);
         this.homefilepath = path.resolve(homefilepath);
+
+        const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
+
+        this.packageDirectories = sfdxProjectJsonParser.getPackageDirectories();
 
         if(rgstrScope) {
             this.rgstrScope = rgstrScope;
@@ -39,6 +44,16 @@ class ApexDoc {
         const homeContents = this.fm.parseHTMLFile(this.homefilepath);
         this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceUrl);
         console.log('ApexDoc has completed!');
+    }
+
+    getClassFilesFromPackageDirectories() {
+        let filesArray = [];
+        
+        this.packageDirectories.forEach((directoryName) => {
+            filesArray.concat(this.getFilesFromDirectory(directoryName));
+        });
+
+        return filesArray;
     }
 
     getFilesFromDirectory(directoryName) {
