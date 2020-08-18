@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/MatthewBlanski/ApexDocJS#readme",
   "dependencies": {
-    "escape-html": "^1.0.3"
+    "escape-html": "^1.0.3",
+    "fs": "0.0.1-security"
   }
 }
