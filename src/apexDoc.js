@@ -1,5 +1,6 @@
 const fs = require('fs');
 const path = require('path');
+const simpleGit = require('simple-git');
 
 const ClassGroup = require('./classGroup.js');
 const ClassModel = require('./classModel.js');
@@ -9,7 +10,7 @@ const PropertyModel = require('./propertyModel.js');
 const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
 
 class ApexDoc {
-    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,hostedSourceUrl) {
+    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope) {
         this.sourceDirectory = path.resolve(sourceDirectory);
         this.targetDirectory = path.resolve(sourceDirectory,targetDirectory);
         this.authorFilePath = path.resolve(authorFilePath);
@@ -24,13 +25,58 @@ class ApexDoc {
         } else {
             this.rgstrScope = ['global','public','webService'];
         }
-        this.hostedSourceUrl = hostedSourceUrl;
+
         this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
     }
 
     runApexDocs() {
-        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
+        const git = simpleGit({
+            baseDir: this.sourceDirectory,
+            binary: 'git',
+            maxConcurrentProcesses: 6,
+        });
 
+        git.checkIsRepo('root').then((response) => {
+            if(response) {
+                git.getRemotes(true).then((response) => {
+                    if(response) {
+                        this.setSourceUrlFromRemotes(response);
+                        this.mainLogic();
+                    } else {
+                        console.log('Something went horribly wrong when trying to find a repo. Aborting!')
+                    }
+                });
+            } else {
+                console.log(this.sourceDirectory + ' is not a root directory for a git repo!')
+            }
+        });
+    }
+
+    setSourceUrlFromRemotes(remoteResponse) {
+        remoteResponse.forEach(remote => {
+            if(remote.name == 'origin') {
+                console.log(remote);
+                if(remote.refs.fetch) {
+                    this.hostedSourceUrl = this.parseRemoteReference(remote.refs.fetch);
+                } else if(remote.refs.push) {
+                    this.hostedSourceUrl = this.parseRemoteReference(remote.refs.push);
+                } else {
+                    console.log('Something went horribly wrong trying to find the source URL from origin!');
+                }
+            }
+        });
+    }
+
+    parseRemoteReference(remoteReference) {
+        if(remoteReference.startsWith('https')) {
+            return remoteReference.replace(/\.git$/,'') + '/tree/master';
+        }
+        
+        return remoteReference.replace(/^[^@]+@([^:]+):/,'https://$1/').replace(/\.git$/,'') + '/tree/master';
+    }
+
+    //TODO: Name this better
+    mainLogic() {
         const filesArray = this.getFilesFromDirectory(this.sourceDirectory);
 
         //Create a new array of ClassModels
