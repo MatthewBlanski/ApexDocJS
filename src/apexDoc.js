@@ -14,6 +14,7 @@ class ApexDoc {
         this.authorFilePath = authorFilePath;
         this.homefilepath = homefilepath;
         this.rgstrScope = rgstrScope;
+        //TODO: Consider argument parsing at a higher level
         this.rgstrArgs = rgstrArgs;
         //TODO: Fix this so it uses the full filename path from the classes in the class models
         this.hostedSourceUrl = hostedSourceUrl;
@@ -29,7 +30,6 @@ class ApexDoc {
         const classModels = this.getClassModelsFromFiles(filesArray);
         const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
-        //TODO: Add resolve HTML and file creation
         const projectDetail = this.fm.parseHTMLFile(this.authorfilepath);
         const homeContents = this.fm.parseHTMLFile(this.homefilepath);
         this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceUrl);
@@ -124,178 +124,176 @@ class ApexDoc {
         let iLine = 0;
 
         try{
-        lineArray.forEach((strLine) => {
-            iLine++;
+            lineArray.forEach((strLine) => {
+                iLine++;
 
-            //TODO - figure out a better way to handle this
-            if(error) {
-                return;
-            }
-
-            if(combinedMethodLine) {
-                combinedMethodLine += strLine;
-
-                if (!combinedMethodLine.includes(')')) {
+                //TODO - figure out a better way to handle this
+                if(error) {
                     return;
                 }
 
-                let mModel = new MethodModel(this.rgstrScope);
-                this.fillMethodModel(mModel, combinedMethodLine, lstComments, iLine);
-                cModel.getMethods().push(mModel);
-                lstComments = [];
-                combinedMethodLine = undefined;
-                return;
-            }
+                if(combinedMethodLine) {
+                    combinedMethodLine += strLine;
 
-            strLine = strLine.trim();
-            if (strLine.length === 0) {
-                return;
-            }
-
-            // ignore anything after // style comments. this allows hiding of tokens from ApexDoc.
-            let ich = strLine.indexOf('//');
-            if (ich > -1) {
-                strLine = strLine.substring(0, ich);
-            }
-
-            // gather up our comments
-            if (strLine.startsWith('/*')) {
-                commentsStarted = true;
-                let commentEnded = false;
-                if(strLine.startsWith('/**')){
-                    if (strLine.endsWith('*/')) {
-                        strLine = strLine.replace('*/', '');
-                        commentEnded = true;
+                    if (!combinedMethodLine.includes(')')) {
+                        return;
                     }
-                    lstComments.push(strLine);
-                    docBlockStarted = true;
-                }
-                if (strLine.endsWith('*/') || commentEnded) {
-                    commentsStarted = false;
-                    docBlockStarted = false;
-                }
-                return;
-            }
 
-            if (commentsStarted && strLine.endsWith('*/')) {
-                strLine = strLine.replace('*/', '');
-                if(docBlockStarted){
-                    lstComments.push(strLine);
-                    docBlockStarted = false;
-                }
-                commentsStarted = false;
-                return;
-            }
-
-            if (commentsStarted) {
-                if(docBlockStarted){
-                    lstComments.push(strLine);
-                }
-                return;
-            }
-
-            // keep track of our nesting so we know which class we are in
-            let openCurlies = this.countChars(strLine, '{');
-            let closeCurlies = this.countChars(strLine, '}');
-            nestedCurlyBraceDepth += openCurlies;
-            nestedCurlyBraceDepth -= closeCurlies;
-
-            // if we are in a nested class, and we just got back to nesting level 1,
-            // then we are done with the nested class, and should set its props and methods.
-            if (nestedCurlyBraceDepth === 1
-                && openCurlies != closeCurlies
-                && cModels.length > 1
-                && cModel
-            ) {
-                cModels.pop();
-                cModel = cModels[cModels.length - 1];
-                return;
-            }
-
-            // ignore anything after an =. this avoids confusing properties with methods.
-            ich = strLine.indexOf('=');
-            if (ich > -1) {
-                strLine = strLine.substring(0, ich);
-            }
-
-            // ignore anything after an {. this avoids confusing properties with methods.
-            ich = strLine.indexOf('{');
-            if (ich > -1) {
-                strLine = strLine.substring(0, ich);
-            }
-
-            // ignore lines not dealing with scope
-            if (!this.strContainsScope(strLine) &&
-                    // interface methods don't have scope
-                !(cModel &&
-                    cModel.getIsInterface()
-                    && strLine.includes('(')
-                )
-            ) {
-                return;
-            }
-
-            // look for a class
-            if (strLine.toLowerCase().includes(' class ') ||
-                strLine.toLowerCase().includes(' interface ')
-            ) {
-                console.log("Class found for " + filePath);
-
-                // create the new class
-                let cModelNew = new ClassModel(cModelParent, this.rgstrScope);
-                this.fillClassModel(cModelParent, cModelNew, strLine, lstComments, iLine);
-                lstComments = [];
-
-                // keep track of the new class, as long as it wasn't a single liner {}
-                // but handle not having any curlies on the class line!
-                if (openCurlies === 0 || openCurlies != closeCurlies) {
-                    cModels.push(cModelNew);
-                    cModel = cModelNew;
-                }
-
-                // add it to its parent (or track the parent)
-                if (cModelParent) {
-                    cModelParent.addChildClass(cModelNew);
-                } else {
-                    cModelParent = cModelNew;
-                }
-
-                return;
-            }
-
-            // look for a method
-            if (strLine.includes('(')) {
-                // deal with a method over multiple lines.
-                if (!strLine.includes(')')) {
-                    combinedMethodLine = strLine;
+                    let mModel = new MethodModel(this.rgstrScope);
+                    this.fillMethodModel(mModel, combinedMethodLine, lstComments, iLine);
+                    cModel.getMethods().push(mModel);
+                    lstComments = [];
+                    combinedMethodLine = undefined;
                     return;
                 }
-                let mModel = new MethodModel(this.rgstrScope);
-                this.fillMethodModel(mModel, strLine, lstComments, iLine);
-                cModel.getMethods().push(mModel);
+
+                strLine = strLine.trim();
+                if (strLine.length === 0) {
+                    return;
+                }
+
+                // ignore anything after // style comments. this allows hiding of tokens from ApexDoc.
+                let ich = strLine.indexOf('//');
+                if (ich > -1) {
+                    strLine = strLine.substring(0, ich);
+                }
+
+                // gather up our comments
+                if (strLine.startsWith('/*')) {
+                    commentsStarted = true;
+                    let commentEnded = false;
+                    if(strLine.startsWith('/**')){
+                        if (strLine.endsWith('*/')) {
+                            strLine = strLine.replace('*/', '');
+                            commentEnded = true;
+                        }
+                        lstComments.push(strLine);
+                        docBlockStarted = true;
+                    }
+                    if (strLine.endsWith('*/') || commentEnded) {
+                        commentsStarted = false;
+                        docBlockStarted = false;
+                    }
+                    return;
+                }
+
+                if (commentsStarted && strLine.endsWith('*/')) {
+                    strLine = strLine.replace('*/', '');
+                    if(docBlockStarted){
+                        lstComments.push(strLine);
+                        docBlockStarted = false;
+                    }
+                    commentsStarted = false;
+                    return;
+                }
+
+                if (commentsStarted) {
+                    if(docBlockStarted){
+                        lstComments.push(strLine);
+                    }
+                    return;
+                }
+
+                // keep track of our nesting so we know which class we are in
+                let openCurlies = this.countChars(strLine, '{');
+                let closeCurlies = this.countChars(strLine, '}');
+                nestedCurlyBraceDepth += openCurlies;
+                nestedCurlyBraceDepth -= closeCurlies;
+
+                // if we are in a nested class, and we just got back to nesting level 1,
+                // then we are done with the nested class, and should set its props and methods.
+                if (nestedCurlyBraceDepth === 1
+                    && openCurlies != closeCurlies
+                    && cModels.length > 1
+                    && cModel
+                ) {
+                    cModels.pop();
+                    cModel = cModels[cModels.length - 1];
+                    return;
+                }
+
+                // ignore anything after an =. this avoids confusing properties with methods.
+                ich = strLine.indexOf('=');
+                if (ich > -1) {
+                    strLine = strLine.substring(0, ich);
+                }
+
+                // ignore anything after an {. this avoids confusing properties with methods.
+                ich = strLine.indexOf('{');
+                if (ich > -1) {
+                    strLine = strLine.substring(0, ich);
+                }
+
+                // ignore lines not dealing with scope
+                if (!this.strContainsScope(strLine) &&
+                        // interface methods don't have scope
+                    !(cModel &&
+                        cModel.getIsInterface()
+                        && strLine.includes('(')
+                    )
+                ) {
+                    return;
+                }
+
+                // look for a class
+                if (strLine.toLowerCase().includes(' class ') ||
+                    strLine.toLowerCase().includes(' interface ')
+                ) {
+
+                    // create the new class
+                    let cModelNew = new ClassModel(cModelParent, this.rgstrScope);
+                    this.fillClassModel(cModelParent, cModelNew, strLine, lstComments, iLine);
+                    lstComments = [];
+
+                    // keep track of the new class, as long as it wasn't a single liner {}
+                    // but handle not having any curlies on the class line!
+                    if (openCurlies === 0 || openCurlies != closeCurlies) {
+                        cModels.push(cModelNew);
+                        cModel = cModelNew;
+                    }
+
+                    // add it to its parent (or track the parent)
+                    if (cModelParent) {
+                        cModelParent.addChildClass(cModelNew);
+                    } else {
+                        cModelParent = cModelNew;
+                    }
+
+                    return;
+                }
+
+                // look for a method
+                if (strLine.includes('(')) {
+                    // deal with a method over multiple lines.
+                    if (!strLine.includes(')')) {
+                        combinedMethodLine = strLine;
+                        return;
+                    }
+                    let mModel = new MethodModel(this.rgstrScope);
+                    this.fillMethodModel(mModel, strLine, lstComments, iLine);
+                    cModel.getMethods().push(mModel);
+                    lstComments = [];
+                    return;
+                }
+
+                // handle set & get within the property
+                if (strLine.includes(' get ') ||
+                    strLine.includes(' set ') ||
+                    strLine.includes(' get;') ||
+                    strLine.includes(' set;') ||
+                    strLine.includes(' get{') ||
+                    strLine.includes(' set{')
+                ) {
+                    return;
+                }
+
+                // must be a property
+                let propertyModel = new PropertyModel(this.rgstrScope);
+                this.fillPropertyModel(propertyModel, strLine, lstComments, iLine);
+                cModel.getProperties().push(propertyModel);
                 lstComments = [];
                 return;
-            }
-
-            // handle set & get within the property
-            if (strLine.includes(' get ') ||
-                strLine.includes(' set ') ||
-                strLine.includes(' get;') ||
-                strLine.includes(' set;') ||
-                strLine.includes(' get{') ||
-                strLine.includes(' set{')
-            ) {
-                return;
-            }
-
-            // must be a property
-            let propertyModel = new PropertyModel(this.rgstrScope);
-            this.fillPropertyModel(propertyModel, strLine, lstComments, iLine);
-            cModel.getProperties().push(propertyModel);
-            lstComments = [];
-            return;
-        });
-
+            });
         } catch(e) {
             console.log("Error on Line " + iLine + " " + filePath);
             return null;

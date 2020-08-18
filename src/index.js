@@ -1,11 +1,12 @@
 const ApexDoc = require('./apexDoc.js');
 
-const apexDocEngine = new ApexDoc('/Users/mblanski/Documents/Projects/EDA/src',
-    '/Users/mblanski/Documents/Projects/EDA/ApexDoc',
+//TODO - implement process.argv.slice
+const apexDocEngine = new ApexDoc('/Users/mblanski/Documents/Projects/NPSP/src',
+    '/Users/mblanski/Documents/Projects/NPSP/ApexDoc',
     '',
     './src',
     ['global','public','webService'],
     [],
-    'https://github.com/SalesforceFoundation/EDA/tree/master/src/classes/'
+    'https://github.com/SalesforceFoundation/NPSP/tree/master/src/classes/'
 );
 apexDocEngine.runApexDocs();
