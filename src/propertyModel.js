@@ -26,7 +26,7 @@ class PropertyModel extends ApexModel {
     }
 
     getPropertyName() {
-        let nameLine = getNameLine().trim();
+        let nameLine = this.getNameLine().trim();
         if (nameLine && nameLine.length > 0) {
             const lastindex = nameLine.lastIndexOf(" ");
             if (lastindex >= 0) {

@@ -29,15 +29,16 @@ class FileManager {
         }
     }
 
-    /*escapeHTML(s) {
+    escapeHTML(s) {
         //TODO confirm this is functional. Was stringbuilder
-        let out = "";
+        /*let out = "";
         for (let i = 0; i < s.length; i++) {
             let c = s.charAt(i);
             out += escapeHtml(c);
         }
-        return out;
-    }*/
+        return out;*/
+        return escapeHtml(s);
+    }
 
     createHTML(mapFNameToContent, monitor) {
         let constants = new Constants();
@@ -144,8 +145,8 @@ class FileManager {
             }
             contents += "</div>";
 
-            contents = Constants.getHeader(projectDetail) + contents + Constants.FOOTER;
-            mapFNameToContent.put(fileName, contents);
+            contents = constants.getHeader(projectDetail) + contents + constants.FOOTER;
+            mapFNameToContent.set(fileName, contents);
         });
         this.createHTML(mapFNameToContent);
     }
@@ -160,23 +161,23 @@ class FileManager {
     htmlForClassModel(cModel, hostedSourceURL) {
         let contents = "";
         contents += "<h2 class='section-title'>" +
-                strLinkfromModel(cModel, cModel.getTopmostClassName(), hostedSourceURL) +
+                this.strLinkfromModel(cModel, cModel.getTopmostClassName(), hostedSourceURL) +
                 cModel.getClassName() + "</a>" +
                 "</h2>";
 
         contents += "<div class='classSignature'>" +
                 this.strLinkfromModel(cModel, cModel.getTopmostClassName(), hostedSourceURL) +
-                escapeHTML(cModel.getNameLine()) + "</a></div>";
+                this.escapeHTML(cModel.getNameLine()) + "</a></div>";
 
         //TODO: Confirm this is functional in JS
         if (cModel.getDescription() != "") {
-            contents += "<div class='classDetails'>" + escapeHTML(cModel.getDescription());
+            contents += "<div class='classDetails'>" + this.escapeHTML(cModel.getDescription());
         }
         if (cModel.getAuthor() != "") {
-            contents += "<br/><br/>" + escapeHTML(cModel.getAuthor());
+            contents += "<br/><br/>" + this.escapeHTML(cModel.getAuthor());
         }
         if (cModel.getDate() != "") {
-            contents += "<br/>" + escapeHTML(cModel.getDate());
+            contents += "<br/>" + this.escapeHTML(cModel.getDate());
         }
         contents += "</div><p/>";
 
@@ -192,8 +193,8 @@ class FileManager {
                         prop.getPropertyName() + "</td>";
                 contents += "<td><div class='clsPropertyDeclaration'>" +
                         this.strLinkfromModel(prop, cModel.getTopmostClassName(), hostedSourceURL) +
-                        escapeHTML(prop.getNameLine()) + "</a></div>";
-                contents += "<div class='clsPropertyDescription'>" + escapeHTML(prop.getDescription()) + "</div></tr>";
+                        this.escapeHTML(prop.getNameLine()) + "</a></div>";
+                contents += "<div class='clsPropertyDescription'>" + this.escapeHTML(prop.getDescription()) + "</div></tr>";
             });
             // end Properties
             contents += "</table></div><p/>";
@@ -225,16 +226,16 @@ class FileManager {
                         + method.getMethodName() + "</h2>" +
                         "<div class='methodSignature'>" +
                         this.strLinkfromModel(method, cModel.getTopmostClassName(), hostedSourceURL) +
-                        escapeHTML(method.getNameLine()) + "</a></div>";
+                        this.escapeHTML(method.getNameLine()) + "</a></div>";
 
                 if (method.getDescription() != "") {
-                    contents += "<div class='methodDescription'>" + escapeHTML(method.getDescription()) + "</div>";
+                    contents += "<div class='methodDescription'>" + this.escapeHTML(method.getDescription()) + "</div>";
                 }
 
                 if (method.getParams().length > 0) {
                     contents += "<div class='methodSubTitle'>Parameters</div>";
                     method.getParams().forEach((param) => {
-                        param = escapeHTML(param);
+                        param = this.escapeHTML(param);
                         if (param && param.trim().length > 0) {
 
                             //Confirm this works
@@ -263,22 +264,22 @@ class FileManager {
                 //TODO: Confirm this works in js
                 if (method.getReturns() != "") {
                     contents += "<div class='methodSubTitle'>Return Value</div>";
-                    contents += "<div class='methodReturns'>" + escapeHTML(method.getReturns()) + "</div>";
+                    contents += "<div class='methodReturns'>" + this.escapeHTML(method.getReturns()) + "</div>";
                 }
 
                 if (method.getExample() != "") {
                     contents += "<div class='methodSubTitle'>Example</div>";
-                    contents += "<code class='methodExample'>" + escapeHTML(method.getExample()) + "</code>";
+                    contents += "<code class='methodExample'>" + this.escapeHTML(method.getExample()) + "</code>";
                 }
 
                 if (method.getAuthor() != "") {
                     contents += "<div class='methodSubTitle'>Author</div>";
-                    contents += "<div class='methodReturns'>" + escapeHTML(method.getAuthor()) + "</div>";
+                    contents += "<div class='methodReturns'>" + this.escapeHTML(method.getAuthor()) + "</div>";
                 }
 
                 if (method.getDate() != "") {
                     contents += "<div class='methodSubTitle'>Date</div>";
-                    contents += "<div class='methodReturns'>" + escapeHTML(method.getDate()) + "</div>";
+                    contents += "<div class='methodReturns'>" + this.escapeHTML(method.getDate()) + "</div>";
                 }
 
                 // end current method
@@ -302,7 +303,7 @@ class FileManager {
                 if (cgContent != "") {
                     let strHtml = constants.getHeader(projectDetail) + links + "<td class='contentTD'>" +
                             "<h2 class='section-title'>" +
-                            escapeHTML(cg.getName()) + "</h2>" + cgContent + "</td>";
+                            this.escapeHTML(cg.getName()) + "</h2>" + cgContent + "</td>";
                     strHtml += constants.FOOTER;
                     mapFNameToContent.set(cg.getContentFilename(), strHtml);
                 }
@@ -347,6 +348,10 @@ class FileManager {
         let mapGroupNameToClassGroupKeys = Array.from(tm.keys());
         mapGroupNameToClassGroupKeys.forEach((strGroup) => {
             let cg = mapGroupNameToClassGroup.get(strGroup);
+
+            if(!cg) {
+                cg = mapGroupNameToClassGroup.get("Miscellaneous");
+            }
             let strGoTo = "onclick=\"gotomenu(document.location.href, event);return false;\"";
             if (cg.getContentFilename()) {
                 strGoTo = "onclick=\"gotomenu('" + cg.getContentFilename() + ".html" + "', event);return false;\"";

@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const readline = require('readline');
 
 const ClassGroup = require('./classGroup.js');
 const ClassModel = require('./classModel.js');
@@ -106,7 +105,7 @@ class ApexDoc {
         return classModels;
     }
 
-    async parseFileContents(filePath) {
+    parseFileContents(filePath) {
         let commentsStarted = false;
         let docBlockStarted = false;
         let nestedCurlyBraceDepth = 0;
@@ -117,16 +116,16 @@ class ApexDoc {
         let combinedMethodLine;
         let error;
 
-        const fileStreamByLines = readline.createInterface({
-            input: fs.createReadStream(filePath),
-            output: process.stdout,
-            terminal: false
-        });
-
+        //TODO - get someone better at handling readfiles
         console.log("Processing file " + filePath);
 
+        let file = fs.readFileSync(filePath, {encoding:'utf8',flag:'r'});
+        let lineArray = file.split("\n");
+ 
         let iLine = 0;
-        fileStreamByLines.on('line', (strLine) => {
+
+        try{
+        lineArray.forEach((strLine) => {
             iLine++;
 
             //TODO - figure out a better way to handle this
@@ -296,15 +295,14 @@ class ApexDoc {
             cModel.getProperties().push(propertyModel);
             lstComments = [];
             return;
-        }).on('error', (e) => {
-            this.error = true;
-            console.log("Line " + iLine + " " + filePath);
-            return;
         });
 
-        if(error) {
+        } catch(e) {
+            console.log("Error on Line " + iLine + " " + filePath);
             return null;
         }
+
+        console.log("Finished on Line " + iLine + " " + filePath);
 
         return cModelParent;
     }

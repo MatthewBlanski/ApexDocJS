@@ -68,7 +68,7 @@ class ClassModel extends ApexModel{
 
     getClassName() {
         let nameLine = this.getNameLine();
-        let strParent = (!cmodelParent ? "" : cmodelParent.getClassName() + ".");
+        let strParent = (!this.cmodelParent ? "" : this.cmodelParent.getClassName() + ".");
         if (nameLine) {
             nameLine = nameLine.trim();
 
