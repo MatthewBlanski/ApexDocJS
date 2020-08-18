@@ -1,5 +1,7 @@
 class ApexModel {
-    constructor() {}
+    constructor(rgstrScope) {
+        this.rgstrScope = rgstrScope;
+    }
 
     getNameLine() {
         return this.nameLine;
@@ -75,19 +77,19 @@ class ApexModel {
         this.scope = null;
 
         if(this.nameLine) {
-            let str = this.strContainsScope(nameLine);
+            let str = this.strContainsScope(this.nameLine);
             if (str) {
-                scope = str;
+                this.scope = str;
             }
-            this.scope = nameLine;
+            this.scope = this.nameLine;
         }
     }
 
     strContainsScope(str) {
         str = str.toLowerCase();
-        for (let i = 0; i < rgstrScope.length; i++) {
-            if (str.toLowerCase().contains(rgstrScope[i].toLowerCase() + " ")) {
-                return rgstrScope[i];
+        for (let i = 0; i < this.rgstrScope.length; i++) {
+            if (str.toLowerCase().includes(this.rgstrScope[i].toLowerCase() + " ")) {
+                return this.rgstrScope[i];
             }
         }
         return null;

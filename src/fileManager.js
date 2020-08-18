@@ -9,11 +9,11 @@ const ClassGroup = require('./classGroup');
 
 class FileManager {
 
-    constructor() {
+/*    constructor() {
         this.path = "";
         this.header = "";
         this.APEX_DOC_PATH = "";
-    }
+    }*/
 
     constructor(path,rgstrScope) {
         this.rgstrScope = rgstrScope;
@@ -140,7 +140,7 @@ class FileManager {
 
                 });
             } else {
-                continue;
+                return;
             }
             contents += "</div>";
 

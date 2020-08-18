@@ -1,5 +1,8 @@
-class ClassModel {
-    constructor(cmodelParent) {
+const ApexModel = require('./apexModel.js');
+  
+class ClassModel extends ApexModel{
+    constructor(cmodelParent,rgstrScope) {
+        super(rgstrScope);
         this.methods = [];
         this.properties = [];
         this.cmodelParent = cmodelParent;
@@ -60,7 +63,7 @@ class ClassModel {
     }
 
     addChildClass(child) {
-        this.childClasses.add(child);
+        this.childClasses.push(child);
     }
 
     getClassName() {

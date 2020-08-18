@@ -11,7 +11,9 @@ const FileManager = require('./fileManager.js');
 class ApexDoc {
     constructor(sourceDirectory) {
         this.sourceDirectory = sourceDirectory;
-        this.targetDirectory = "../"
+        this.targetDirectory = "../";
+        this.authorFilePath = "";
+        this.homefilepath = "";
         this.rgstrScope = ['global','public','webService'];
         this.rgstrArgs = [];
         this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
@@ -22,16 +24,15 @@ class ApexDoc {
         this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
 
         const filesArray = this.getFilesFromDirectory(this.sourceDirectory);
-        console.log(JSON.stringify(filesArray));
 
         //Create a new array of ClassModels
         const classModels = this.getClassModelsFromFiles(filesArray);
         const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
         //TODO: Add resolve HTML and file creation
-        const projectDetail = this.fm.parseHTMLFile(authorfilepath);
-        const homeContents; this.fm.parseHTMLFile(homefilepath);
-        fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, hostedSourceURL);
+        const projectDetail = this.fm.parseHTMLFile(this.authorfilepath);
+        const homeContents = this.fm.parseHTMLFile(this.homefilepath);
+        this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceURL);
         console.log('ApexDoc has completed!');
     }
 
@@ -42,7 +43,7 @@ class ApexDoc {
 
         directory.forEach((directoryEntry) => {
             if(directoryEntry.isFile()) {
-                if(directoryEntry.name.endsWith('.js')) {
+                if(directoryEntry.name.endsWith('.cls')) {
                     filesArray.push(path.resolve(directoryName, directoryEntry.name));
                 }
             } else if (directoryEntry.isDirectory()) {
@@ -105,7 +106,7 @@ class ApexDoc {
         return classModels;
     }
 
-    parseFileContents(filePath) {
+    async parseFileContents(filePath) {
         let commentsStarted = false;
         let docBlockStarted = false;
         let nestedCurlyBraceDepth = 0;
@@ -114,6 +115,7 @@ class ApexDoc {
         let cModelParent;
         let cModels = [];
         let combinedMethodLine;
+        let error;
 
         const fileStreamByLines = readline.createInterface({
             input: fs.createReadStream(filePath),
@@ -121,21 +123,28 @@ class ApexDoc {
             terminal: false
         });
 
+        console.log("Processing file " + filePath);
+
         let iLine = 0;
         fileStreamByLines.on('line', (strLine) => {
             iLine++;
 
+            //TODO - figure out a better way to handle this
+            if(error) {
+                return;
+            }
+
             if(combinedMethodLine) {
                 combinedMethodLine += strLine;
 
-                if (!combinedMethodLine.contains(')')) {
+                if (!combinedMethodLine.includes(')')) {
                     return;
                 }
 
-                let mModel = new MethodModel();
+                let mModel = new MethodModel(this.rgstrScope);
                 this.fillMethodModel(mModel, combinedMethodLine, lstComments, iLine);
-                cModel.getMethods().add(mModel);
-                lstComments.clear();
+                cModel.getMethods().push(mModel);
+                lstComments = [];
                 combinedMethodLine = undefined;
                 return;
             }
@@ -222,21 +231,22 @@ class ApexDoc {
                     // interface methods don't have scope
                 !(cModel &&
                     cModel.getIsInterface()
-                    && strLine.contains('(')
+                    && strLine.includes('(')
                 )
             ) {
                 return;
             }
 
             // look for a class
-            if (strLine.toLowerCase().contains(' class ') ||
-                strLine.toLowerCase().contains(' interface ')
+            if (strLine.toLowerCase().includes(' class ') ||
+                strLine.toLowerCase().includes(' interface ')
             ) {
+                console.log("Class found for " + filePath);
 
                 // create the new class
-                let cModelNew = new ClassModel(cModelParent);
+                let cModelNew = new ClassModel(cModelParent, this.rgstrScope);
                 this.fillClassModel(cModelParent, cModelNew, strLine, lstComments, iLine);
-                lstComments.clear();
+                lstComments = [];
 
                 // keep track of the new class, as long as it wasn't a single liner {}
                 // but handle not having any curlies on the class line!
@@ -256,37 +266,45 @@ class ApexDoc {
             }
 
             // look for a method
-            if (strLine.contains('(')) {
+            if (strLine.includes('(')) {
                 // deal with a method over multiple lines.
-                if (!strLine.contains(')')) {
+                if (!strLine.includes(')')) {
                     combinedMethodLine = strLine;
                     return;
                 }
-                let mModel = new MethodModel();
+                let mModel = new MethodModel(this.rgstrScope);
                 this.fillMethodModel(mModel, strLine, lstComments, iLine);
-                cModel.getMethods().add(mModel);
-                lstComments.clear();
+                cModel.getMethods().push(mModel);
+                lstComments = [];
                 return;
             }
 
             // handle set & get within the property
-            if (strLine.contains(' get ') ||
-                strLine.contains(' set ') ||
-                strLine.contains(' get;') ||
-                strLine.contains(' set;') ||
-                strLine.contains(' get{') ||
-                strLine.contains(' set{')
+            if (strLine.includes(' get ') ||
+                strLine.includes(' set ') ||
+                strLine.includes(' get;') ||
+                strLine.includes(' set;') ||
+                strLine.includes(' get{') ||
+                strLine.includes(' set{')
             ) {
                 return;
             }
 
             // must be a property
-            let propertyModel = new PropertyModel();
+            let propertyModel = new PropertyModel(this.rgstrScope);
             this.fillPropertyModel(propertyModel, strLine, lstComments, iLine);
-            cModel.getProperties().add(propertyModel);
-            lstComments.clear();
+            cModel.getProperties().push(propertyModel);
+            lstComments = [];
+            return;
+        }).on('error', (e) => {
+            this.error = true;
+            console.log("Line " + iLine + " " + filePath);
             return;
         });
+
+        if(error) {
+            return null;
+        }
 
         return cModelParent;
     }
@@ -294,7 +312,7 @@ class ApexDoc {
     strContainsScope(str) {
         str = str.toLowerCase();
         for (let i = 0; i < this.rgstrScope.length; i++) {
-            if (str.toLowerCase().contains(this.rgstrScope[i].toLowerCase() + " ")) {
+            if (str.toLowerCase().includes(this.rgstrScope[i].toLowerCase() + " ")) {
                 return this.rgstrScope[i];
             }
         }
@@ -310,7 +328,7 @@ class ApexDoc {
             comment = comment.trim();
             let idxStart = comment.toLowerCase().indexOf("@description");
             if (idxStart != -1 || i === 1) {
-            	if (idxStart != -1 && comment.length() > idxStart + 13) {
+            	if (idxStart != -1 && comment.length > idxStart + 13) {
                     propertyModel.setDescription(comment.substring(idxStart + 13).trim());
                 } else {
                     //TODO - Confirm this is identical
@@ -326,7 +344,7 @@ class ApexDoc {
             // handle multiple lines for description.
             if (inDescription) {
                 let j;
-                for (j = 0; j < comment.length(); j++) {
+                for (j = 0; j < comment.length; j++) {
                     const ch = comment.charAt(j);
                     if (ch != '*' && ch != ' ') {
                         break;
@@ -375,7 +393,7 @@ class ApexDoc {
 
             idxStart = comment.toLowerCase().indexOf("@param");
             if (idxStart != -1) {
-                mModel.getParams().add(comment.substring(idxStart + 6).trim());
+                mModel.getParams().push(comment.substring(idxStart + 6).trim());
                 inDescription = false;
                 inExample = false;
                 return;
@@ -383,7 +401,7 @@ class ApexDoc {
 
             idxStart = comment.toLowerCase().indexOf("@description");
             if (idxStart != -1 || i === 1) {
-                if (idxStart != -1 && comment.length() >= idxStart + 12)
+                if (idxStart != -1 && comment.length >= idxStart + 12)
                     mModel.setDescription(comment.substring(idxStart + 12).trim());
                 else{
                     //TODO - Confirm this is identical
@@ -399,7 +417,7 @@ class ApexDoc {
 
             idxStart = comment.toLowerCase().indexOf("@example");
             if (idxStart != -1 || i === 1) {
-                if (idxStart != -1 && comment.length() >= idxStart + 8) {
+                if (idxStart != -1 && comment.length >= idxStart + 8) {
                     mModel.setExample(comment.substring(idxStart + 8).trim());
                 } else {
                     //TODO - Confirm this is identical
@@ -416,7 +434,7 @@ class ApexDoc {
             // handle multiple lines for @description and @example.
             if (inDescription || inExample) {
                 let j;
-                for (j = 0; j < comment.length(); j++) {
+                for (j = 0; j < comment.length; j++) {
                     let ch = comment.charAt(j);
                     if (ch != '*' && ch != ' ') {
                         break;
@@ -432,7 +450,7 @@ class ApexDoc {
                         }
 
                         mModel.setExample(mModel.getExample()
-                            + (mModel.getExample().trim().length() === 0 ? "" : "\n")
+                            + (mModel.getExample().trim().length === 0 ? "" : "\n")
                             + comment.substring(2));
                     }
                 }
@@ -443,7 +461,7 @@ class ApexDoc {
 
     fillClassModel(cModelParent, cModel, name, lstComments, iLine) {
         cModel.setNameLine(name, iLine);
-        if (name.toLowerCase().contains(" interface ")) {
+        if (name.toLowerCase().includes(" interface ")) {
             cModel.setIsInterface(true);
         }
         let inDescription = false;
@@ -482,7 +500,7 @@ class ApexDoc {
 
             idxStart = comment.toLowerCase().indexOf("@description");
             if (idxStart != -1 || i === 1) {
-            	if (idxStart != -1 && comment.length() > idxStart + 13)
+            	if (idxStart != -1 && comment.length > idxStart + 13)
             		cModel.setDescription(comment.substring(idxStart + 12).trim());
             	else{
                     //TODO - Confirm this is identical
