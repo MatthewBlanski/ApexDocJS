@@ -6,7 +6,6 @@ const apexDocEngine = new ApexDoc('/Users/mblanski/Documents/Projects/NPSP',
     '',
     './src',
     ['global','public','webService'],
-    [],
     'https://github.com/SalesforceFoundation/NPSP/tree/master/'
 );
 apexDocEngine.runApexDocs();

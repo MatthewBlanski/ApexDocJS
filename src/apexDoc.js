@@ -9,7 +9,7 @@ const PropertyModel = require('./propertyModel.js');
 const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
 
 class ApexDoc {
-    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,rgstrArgs,hostedSourceUrl) {
+    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,hostedSourceUrl) {
         this.sourceDirectory = path.resolve(sourceDirectory);
         this.targetDirectory = path.resolve(sourceDirectory,targetDirectory);
         this.authorFilePath = path.resolve(authorFilePath);
@@ -24,9 +24,6 @@ class ApexDoc {
         } else {
             this.rgstrScope = ['global','public','webService'];
         }
-        //TODO: Consider argument parsing at a higher level
-        this.rgstrArgs = rgstrArgs;
-        //TODO: Fix this so it uses the full filename path from the classes in the class models
         this.hostedSourceUrl = hostedSourceUrl;
         this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
     }
