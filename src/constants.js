@@ -37,7 +37,7 @@ class Constants {
 
     getHeader(projectDetail) {
         if (projectDetail && projectDetail.trim().length > 0) {
-            return header = this.HEADER_OPEN + projectDetail;
+            return this.HEADER_OPEN + projectDetail;
         }
         return this.HEADER_OPEN + this.PROJECT_DETAIL + this.HEADER_CLOSE;
     }
