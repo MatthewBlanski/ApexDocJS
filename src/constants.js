@@ -22,7 +22,7 @@ class Constants {
 
         this.DEFAULT_HOME_CONTENTS = "<h1>Project Home</h2>";
 
-        //TODO: have this point to the new location
+        //TODO: This should be unique for each repo and should incorporate the repo's url
         this.PROJECT_DETAIL = 
         "<div class='topsection'>" +
         "<table>" +
@@ -39,7 +39,6 @@ class Constants {
         if (projectDetail && projectDetail.trim().length > 0) {
             return header = this.HEADER_OPEN + projectDetail;
         }
-        console.log(this.HEADER_OPEN + this.PROJECT_DETAIL + this.HEADER_CLOSE);
         return this.HEADER_OPEN + this.PROJECT_DETAIL + this.HEADER_CLOSE;
     }
 }

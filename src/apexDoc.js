@@ -15,8 +15,9 @@ class ApexDoc {
         this.homefilepath = homefilepath;
         this.rgstrScope = rgstrScope;
         this.rgstrArgs = rgstrArgs;
-        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
+        //TODO: Fix this so it uses the full filename path from the classes in the class models
         this.hostedSourceUrl = hostedSourceUrl;
+        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
     }
 
     runApexDocs() {
@@ -31,7 +32,7 @@ class ApexDoc {
         //TODO: Add resolve HTML and file creation
         const projectDetail = this.fm.parseHTMLFile(this.authorfilepath);
         const homeContents = this.fm.parseHTMLFile(this.homefilepath);
-        this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceURL);
+        this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceUrl);
         console.log('ApexDoc has completed!');
     }
 

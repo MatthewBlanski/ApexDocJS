@@ -10,7 +10,6 @@ class FileManager {
 
     constructor(path,rgstrScope) {
         this.rgstrScope = rgstrScope;
-        console.log('Path set to ' + path);
         this.path = path;
         this.header = "";
         this.APEX_DOC_PATH = "";
@@ -27,16 +26,8 @@ class FileManager {
     createHTML(mapFNameToContent) {
         let constants = new Constants();
         try {
-            /*
-            if (this.path.endsWith("/") || this.path.endsWith("\\")) {
-                this.path += constants.ROOT_DIRECTORY; // + "/" + fileName + ".html";
-            } else {
-                this.path += "/" + constants.ROOT_DIRECTORY; // + "/" + fileName + ".html";
-            }*/
-            console.log(this.path);
             //Make directory and dependent directories
             if(!fs.existsSync(this.path)) {
-                console.log('Creating directory ' + this.path);
                 fs.mkdirSync(this.path);
             }
 
@@ -112,7 +103,6 @@ class FileManager {
             if (cModel.getNameLine() && cModel.getNameLine().length > 0) {
                 fileName = cModel.getClassName();
                 contents += "<td class='contentTD'>";
-
                 contents += this.htmlForClassModel(cModel, hostedSourceURL);
 
                 // deal with any nested classes
@@ -405,8 +395,8 @@ class FileManager {
         return filesArray;
     }
 
-    createDoc(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL, monitor) {
-        this.makeFile(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL, monitor);
+    createDoc(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL) {
+        this.makeFile(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL);
     }
 
     parseFile(filePath) {
