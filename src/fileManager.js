@@ -74,7 +74,7 @@ class FileManager {
      * @param hostedSourceURL
      * @param monitor
      */
-    makeFile(mapGroupNameToClassGroup, cModels,projectDetail, homeContents, hostedSourceURL) {
+    makeFile(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL) {
         const constants = new Constants();
         let links = "<table width='100%'>";
         links += this.strHTMLScopingPanel();
@@ -271,7 +271,7 @@ class FileManager {
             let cg = mapGroupNameToClassGroup.get(strGroup);
             if (cg.getContentSource()) {
                 let cgContent = this.parseHTMLFile(cg.getContentSource());
-                if (cgContent != "") {
+                if (cgContent) {
                     let strHtml = constants.getHeader(projectDetail) + links + "<td class='contentTD'>" +
                             "<h2 class='section-title'>" +
                             this.escapeHTML(cg.getName()) + "</h2>" + cgContent + "</td>";
