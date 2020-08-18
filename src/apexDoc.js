@@ -8,15 +8,15 @@ const PropertyModel = require('./propertyModel.js');
 const FileManager = require('./fileManager.js');
 
 class ApexDoc {
-    constructor(sourceDirectory) {
+    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope,rgstrArgs,hostedSourceUrl) {
         this.sourceDirectory = sourceDirectory;
-        this.targetDirectory = "../";
-        this.authorFilePath = "";
-        this.homefilepath = "";
-        this.rgstrScope = ['global','public','webService'];
-        this.rgstrArgs = [];
+        this.targetDirectory = targetDirectory;
+        this.authorFilePath = authorFilePath;
+        this.homefilepath = homefilepath;
+        this.rgstrScope = rgstrScope;
+        this.rgstrArgs = rgstrArgs;
         this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
-        this.hostedSourceUrl = "";//TODO include calculation for this
+        this.hostedSourceUrl = hostedSourceUrl;
     }
 
     runApexDocs() {
@@ -117,8 +117,6 @@ class ApexDoc {
         let error;
 
         //TODO - get someone better at handling readfiles
-        console.log("Processing file " + filePath);
-
         let file = fs.readFileSync(filePath, {encoding:'utf8',flag:'r'});
         let lineArray = file.split("\n");
  
@@ -301,8 +299,6 @@ class ApexDoc {
             console.log("Error on Line " + iLine + " " + filePath);
             return null;
         }
-
-        console.log("Finished on Line " + iLine + " " + filePath);
 
         return cModelParent;
     }
