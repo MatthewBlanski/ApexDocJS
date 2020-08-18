@@ -24,7 +24,6 @@ class FileManager {
     }
 
     createHTML(mapFNameToContent) {
-        let constants = new Constants();
         try {
             //Make directory and dependent directories
             if(!fs.existsSync(this.path)) {
