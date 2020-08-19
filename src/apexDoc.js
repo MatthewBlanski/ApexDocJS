@@ -10,23 +10,17 @@ const PropertyModel = require('./propertyModel.js');
 const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
 
 class ApexDoc {
-    constructor(sourceDirectory,targetDirectory,authorFilePath,homefilepath,rgstrScope) {
-        this.sourceDirectory = path.resolve(sourceDirectory);
-        this.targetDirectory = path.resolve(sourceDirectory,targetDirectory);
-        this.authorFilePath = path.resolve(authorFilePath);
-        this.homeilepath = path.resolve(homefilepath);
+    constructor(apexDocsJsonParser) {
+        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
+        this.targetDirectory = apexDocsJsonParser.getTargetDirectory();
+        this.authorFilePath = apexDocsJsonParser.getAuthorFilePath();
+        this.homefilepath = apexDocsJsonParser.getHomeFilePath();
+        this.rgstrScope = apexDocsJsonParser.getRegisterScope();
 
         const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
-
         this.packageDirectories = sfdxProjectJsonParser.getPackageDirectories();
 
-        if(rgstrScope) {
-            this.rgstrScope = rgstrScope;
-        } else {
-            this.rgstrScope = ['global','public','webService'];
-        }
-
-        this.fm = new FileManager(this.targetDirectory,this.rgstrScope);
+        this.fm = new FileManager(apexDocsJsonParser);
     }
 
     runApexDocs() {
@@ -55,7 +49,6 @@ class ApexDoc {
     setSourceUrlFromRemotes(remoteResponse) {
         remoteResponse.forEach(remote => {
             if(remote.name == 'origin') {
-                console.log(remote);
                 if(remote.refs.fetch) {
                     this.hostedSourceUrl = this.parseRemoteReference(remote.refs.fetch);
                 } else if(remote.refs.push) {
@@ -69,7 +62,7 @@ class ApexDoc {
 
     parseRemoteReference(remoteReference) {
         if(remoteReference.startsWith('https')) {
-            return remoteReference.replace(/\.git$/,'') + '/tree/master';
+            return remoteReference.replace(/\.git$/,'') + '/tree/master/';
         }
         
         return remoteReference.replace(/^[^@]+@([^:]+):/,'https://$1/').replace(/\.git$/,'') + '/tree/master';
@@ -77,7 +70,7 @@ class ApexDoc {
 
     //TODO: Name this better
     mainLogic() {
-        const filesArray = this.getFilesFromDirectory(this.sourceDirectory);
+        const filesArray = this.getClassFilesFromPackageDirectories();
 
         //Create a new array of ClassModels
         const classModels = this.getClassModelsFromFiles(filesArray);

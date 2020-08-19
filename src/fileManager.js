@@ -8,13 +8,16 @@ const ClassGroup = require('./classGroup');
 
 class FileManager {
 
-    constructor(path,rgstrScope) {
-        this.rgstrScope = rgstrScope;
-        this.path = path;
+    constructor(apexDocsJsonParser) {
         this.header = "";
         this.APEX_DOC_PATH = "";
 
-        if (!path|| path.trim().length === 0) {
+        this.path = apexDocsJsonParser.getTargetDirectory();
+        this.rgstrScope = apexDocsJsonParser.getRegisterScope();
+        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
+        this.resourcesPath = apexDocsJsonParser.getResourcesPath();
+
+        if (!this.path || this.path.trim().length === 0) {
             this.path = "./";
         }
     }
@@ -361,20 +364,20 @@ class FileManager {
     }
 
     docopy(sourceDirectory,source,target) {
-        const filePath = path.resolve(sourceDirectory,source);
+        const filePath = path.resolve(sourceDirectory, source);
         const file = fs.readFileSync(filePath);
         const resolvedFileName = path.resolve(target, source);
         fs.writeFileSync(resolvedFileName,file);
     }
 
     copy(toFileName) {
-        this.docopy("./resources","apex_doc_logo.png", toFileName);
-        this.docopy("./resources","ApexDoc.css", toFileName);
-        this.docopy("./resources","ApexDoc.js", toFileName);
-        this.docopy("./resources","CollapsibleList.js", toFileName);
-        this.docopy("./resources","jquery-1.11.1.js", toFileName);
-        this.docopy("./resources","toggle_block_btm.gif", toFileName);
-        this.docopy("./resources","toggle_block_stretch.gif", toFileName);
+        this.docopy(this.resourcesPath,"apex_doc_logo.png", toFileName);
+        this.docopy(this.resourcesPath,"ApexDoc.css", toFileName);
+        this.docopy(this.resourcesPath,"ApexDoc.js", toFileName);
+        this.docopy(this.resourcesPath,"CollapsibleList.js", toFileName);
+        this.docopy(this.resourcesPath,"jquery-1.11.1.js", toFileName);
+        this.docopy(this.resourcesPath,"toggle_block_btm.gif", toFileName);
+        this.docopy(this.resourcesPath,"toggle_block_stretch.gif", toFileName);
     }
 
     getFiles(directoryName) {
@@ -389,11 +392,11 @@ class FileManager {
                     }
                 });
             } else {
-                console.log("WARNING: No files found in directory: " + directoryName);
+                console.log("WARNING: No files found in directory: " + path);
             }
         }
 
-        return filesArray;
+        return listOfFilesToCopy;
     }
 
     createDoc(mapGroupNameToClassGroup, cModels, projectDetail, homeContents, hostedSourceURL) {
