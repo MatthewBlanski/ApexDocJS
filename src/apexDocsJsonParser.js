@@ -34,6 +34,13 @@ class ApexDocsJsonParser {
         return this.getApexDocsJson().homeFilePath;
     }
 
+    getMainBranch() {
+        if(!this.getApexDocsJson().mainBranch) {
+            return 'main';
+        }
+        return this.getApexDocsJson().mainBranch;
+    }
+
     getRegisterScope() {
         if(!this.getApexDocsJson().registerScope) {
             return ['global','public','webService'];
