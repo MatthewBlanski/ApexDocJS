@@ -30,44 +30,18 @@ class ApexDoc {
     }
 
     runApexDocs() {
-        const gitService = new GitService(this.sourceDirectory);
+        const gitService = new GitService(
+            this.sourceDirectory,
+            this.mainBranch
+        );
 
-        gitService.simpleGitInstance.checkIsRepo('root').then((response) => {
-            if(response) {
-                gitService.simpleGitInstance.getRemotes(true).then((response) => {
-                    if(response) {
-                        this.setSourceUrlFromRemotes(response);
-                        this.mainLogic();
-                    } else {
-                        console.log('Something went horribly wrong when trying to find a repo. Aborting!')
-                    }
-                });
-            } else {
-                console.log(this.sourceDirectory + ' is not a root directory for a git repo!')
-            }
+        //TODO: Handle rejection elegantly
+        gitService.checkIsRepoRoot()
+        .then((response) => gitService.getRemotes())
+        .then((response) => {
+            this.hostedSourceUrl = gitService.getSourceUrlFromRemotes();
+            this.mainLogic();
         });
-    }
-
-    setSourceUrlFromRemotes(remoteResponse) {
-        remoteResponse.forEach(remote => {
-            if(remote.name == 'origin') {
-                if(remote.refs.fetch) {
-                    this.hostedSourceUrl = this.parseRemoteReference(remote.refs.fetch);
-                } else if(remote.refs.push) {
-                    this.hostedSourceUrl = this.parseRemoteReference(remote.refs.push);
-                } else {
-                    console.log('Something went horribly wrong trying to find the source URL from origin!');
-                }
-            }
-        });
-    }
-
-    parseRemoteReference(remoteReference) {
-        if(remoteReference.startsWith('https')) {
-            return remoteReference.replace(/\.git$/,'') + '/tree/' + this.mainBranch + '/';
-        }
-        
-        return remoteReference.replace(/^[^@]+@([^:]+):/,'https://$1/').replace(/\.git$/,'') + '/tree/'  + this.mainBranch;
     }
 
     //TODO: Name this better
