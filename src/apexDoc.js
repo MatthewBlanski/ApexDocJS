@@ -11,11 +11,12 @@ const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
 
 class ApexDoc {
     constructor(apexDocsJsonParser) {
-        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
-        this.targetDirectory = apexDocsJsonParser.getTargetDirectory();
         this.authorFilePath = apexDocsJsonParser.getAuthorFilePath();
         this.homefilepath = apexDocsJsonParser.getHomeFilePath();
+        this.mainBranch = apexDocsJsonParser.getMainBranch();
         this.rgstrScope = apexDocsJsonParser.getRegisterScope();
+        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
+        this.targetDirectory = apexDocsJsonParser.getTargetDirectory();
 
         const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
         this.packageDirectories = sfdxProjectJsonParser.getPackageDirectories();
@@ -62,10 +63,10 @@ class ApexDoc {
 
     parseRemoteReference(remoteReference) {
         if(remoteReference.startsWith('https')) {
-            return remoteReference.replace(/\.git$/,'') + '/tree/master/';
+            return remoteReference.replace(/\.git$/,'') + '/tree/' + this.mainBranch + '/';
         }
         
-        return remoteReference.replace(/^[^@]+@([^:]+):/,'https://$1/').replace(/\.git$/,'') + '/tree/master';
+        return remoteReference.replace(/^[^@]+@([^:]+):/,'https://$1/').replace(/\.git$/,'') + '/tree/'  + this.mainBranch;
     }
 
     //TODO: Name this better
