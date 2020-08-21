@@ -3,7 +3,7 @@ const path = require('path');
 
 const escapeHtml = require('escape-html');
 
-const Constants = require('./constants.js');
+const Constants = require('./config/constants.js');
 const ClassGroup = require('./classGroup');
 
 class FileManager {
