@@ -1,6 +1,5 @@
 const fs = require('fs');
 const path = require('path');
-const simpleGit = require('simple-git');
 
 
 const ClassModel = require('./apexmodels/classModel.js');
@@ -8,6 +7,9 @@ const MethodModel = require('./apexmodels/methodModel.js');
 const PropertyModel = require('./apexmodels/propertyModel.js');
 
 const SFDXProjectJsonParser = require('./config/sfdxProjectJsonParser.js');
+
+const simpleGit = require('simple-git');
+const GitService = require('./gitservices/gitService.js')
 
 const ClassGroup = require('./classGroup.js');
 const FileManager = require('./fileManager.js');
@@ -28,15 +30,11 @@ class ApexDoc {
     }
 
     runApexDocs() {
-        const git = simpleGit({
-            baseDir: this.sourceDirectory,
-            binary: 'git',
-            maxConcurrentProcesses: 6,
-        });
+        const gitService = new GitService(this.sourceDirectory);
 
-        git.checkIsRepo('root').then((response) => {
+        gitService.simpleGitInstance.checkIsRepo('root').then((response) => {
             if(response) {
-                git.getRemotes(true).then((response) => {
+                gitService.simpleGitInstance.getRemotes(true).then((response) => {
                     if(response) {
                         this.setSourceUrlFromRemotes(response);
                         this.mainLogic();
