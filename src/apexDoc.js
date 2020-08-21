@@ -6,9 +6,11 @@ const simpleGit = require('simple-git');
 const ClassModel = require('./apexmodels/classModel.js');
 const MethodModel = require('./apexmodels/methodModel.js');
 const PropertyModel = require('./apexmodels/propertyModel.js');
+
+const SFDXProjectJsonParser = require('./config/sfdxProjectJsonParser.js');
+
 const ClassGroup = require('./classGroup.js');
 const FileManager = require('./fileManager.js');
-const SFDXProjectJsonParser = require('./jsonparsers/sfdxProjectJsonParser.js');
 
 class ApexDoc {
     constructor(apexDocsJsonParser) {
