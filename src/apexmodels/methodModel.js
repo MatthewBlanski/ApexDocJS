@@ -2,8 +2,8 @@ const ApexModel = require('./apexModel.js');
 
 class MethodModel extends ApexModel {
 
-    constructor(rgstrScope) {
-        super(rgstrScope);
+    constructor(accessModifiers) {
+        super(accessModifiers);
         this.params = [];
     }
 

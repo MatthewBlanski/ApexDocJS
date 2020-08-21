@@ -1,8 +1,8 @@
 const ApexModel = require('./apexModel.js');
   
 class ClassModel extends ApexModel{
-    constructor(cmodelParent,rgstrScope) {
-        super(rgstrScope);
+    constructor(cmodelParent,accessModifiers) {
+        super(accessModifiers);
         this.methods = [];
         this.properties = [];
         this.cmodelParent = cmodelParent;

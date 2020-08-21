@@ -20,11 +20,18 @@ class ApexDocsJsonParser {
         return this.apexDocsJson;
     }
 
-    getAuthorFilePath() {
-        if(!this.getApexDocsJson().authorFilePath) {
+    getAccessModifiers() {
+        if(!this.getApexDocsJson().accessModifiers) {
+            return ['global','public','webService'];
+        }
+        return this.getApexDocsJson().accessModifiers;
+    }
+
+    getBannerFilePath() {
+        if(!this.getApexDocsJson().bannerFilePath) {
             return '';
         }
-        return this.getApexDocsJson().authorFilePath;
+        return this.getApexDocsJson().bannerFilePath;
     }
 
     getHomeFilePath() {
@@ -39,13 +46,6 @@ class ApexDocsJsonParser {
             return 'main';
         }
         return this.getApexDocsJson().mainBranch;
-    }
-
-    getRegisterScope() {
-        if(!this.getApexDocsJson().registerScope) {
-            return ['global','public','webService'];
-        }
-        return this.getApexDocsJson().registerScope;
     }
 
     getResourcesPath() {
