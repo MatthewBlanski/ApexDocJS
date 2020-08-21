@@ -2,12 +2,13 @@ const fs = require('fs');
 const path = require('path');
 const simpleGit = require('simple-git');
 
+
+const ClassModel = require('./apexmodels/classModel.js');
+const MethodModel = require('./apexmodels/methodModel.js');
+const PropertyModel = require('./apexmodels/propertyModel.js');
 const ClassGroup = require('./classGroup.js');
-const ClassModel = require('./classModel.js');
 const FileManager = require('./fileManager.js');
-const MethodModel = require('./methodModel.js');
-const PropertyModel = require('./propertyModel.js');
-const SFDXProjectJsonParser = require('./sfdxProjectJsonParser.js');
+const SFDXProjectJsonParser = require('./jsonparsers/sfdxProjectJsonParser.js');
 
 class ApexDoc {
     constructor(apexDocsJsonParser) {
