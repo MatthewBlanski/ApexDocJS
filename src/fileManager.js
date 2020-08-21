@@ -12,8 +12,8 @@ class FileManager {
         this.header = "";
         this.APEX_DOC_PATH = "";
 
+        this.accessModifiers = apexDocsJsonParser.getAccessModifiers();
         this.path = apexDocsJsonParser.getTargetDirectory();
-        this.rgstrScope = apexDocsJsonParser.getRegisterScope();
         this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
         this.resourcesPath = apexDocsJsonParser.getResourcesPath();
 
@@ -62,10 +62,10 @@ class FileManager {
         let str = "<tr><td colspan='2' style='text-align: center;' >";
         str += "Show: ";
 
-        for (let i = 0; i < this.rgstrScope.length; i++) {
-            str += "<input type='checkbox' checked='checked' id='cbx" + this.rgstrScope[i] +
-                    "' onclick='ToggleScope(\"" + this.rgstrScope[i] + "\", this.checked );'>" +
-                    this.rgstrScope[i] + "</input>&nbsp;&nbsp;";
+        for (let i = 0; i < this.accessModifiers.length; i++) {
+            str += "<input type='checkbox' checked='checked' id='cbx" + this.accessModifiers[i] +
+                    "' onclick='ToggleScope(\"" + this.accessModifiers[i] + "\", this.checked );'>" +
+                    this.accessModifiers[i] + "</input>&nbsp;&nbsp;";
         }
         str += "</td></tr>";
         return str;

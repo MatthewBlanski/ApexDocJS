@@ -16,10 +16,10 @@ const FileManager = require('./fileManager.js');
 
 class ApexDoc {
     constructor(apexDocsJsonParser) {
-        this.authorFilePath = apexDocsJsonParser.getAuthorFilePath();
+        this.accessModifiers = apexDocsJsonParser.getAccessModifiers();
+        this.bannerFilePath = apexDocsJsonParser.getBannerFilePath();
         this.homefilepath = apexDocsJsonParser.getHomeFilePath();
         this.mainBranch = apexDocsJsonParser.getMainBranch();
-        this.rgstrScope = apexDocsJsonParser.getRegisterScope();
         this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
         this.targetDirectory = apexDocsJsonParser.getTargetDirectory();
 
@@ -52,7 +52,7 @@ class ApexDoc {
         const classModels = this.getClassModelsFromFiles(filesArray);
         const mapGroupNameToClassGroup = this.createMapGroupNameToClassGroup(classModels, this.sourceDirectory);
 
-        const projectDetail = this.fm.parseHTMLFile(this.authorFilePath);
+        const projectDetail = this.fm.parseHTMLFile(this.bannerFilePath);
         const homeContents = this.fm.parseHTMLFile(this.homefilepath);
         this.fm.createDoc(mapGroupNameToClassGroup, classModels, projectDetail, homeContents, this.hostedSourceUrl);
         console.log('ApexDoc has completed!');
@@ -87,7 +87,7 @@ class ApexDoc {
         return filesArray;
     }
 
-    printHelp() {
+    /*printHelp() {
         console.log("ApexDoc - a tool for generating documentation from Salesforce Apex code class files.\n");
         console.log("    Invalid Arguments detected.  The correct syntax is:\n");
         console.log("apexdoc -s <source_directory> [-t <target_directory>] [-g <source_url>] [-h <homefile>] [-a <authorfile>] [-p <scope>]\n");
@@ -97,7 +97,7 @@ class ApexDoc {
         console.log("<homefile> - Optional. Specifies the html file that contains the contents for the home page\'s content area.");
         console.log("<authorfile> - Optional. Specifies the text file that contains project information for the documentation header.");
         console.log("<scope> - Optional. Semicolon seperated list of scopes to document.  Defaults to 'global;public'. ");
-    }
+    }*/
 
     createMapGroupNameToClassGroup(cModels,sourceDirectory) {
         let map = new Map();
@@ -166,7 +166,7 @@ class ApexDoc {
                         return;
                     }
 
-                    let mModel = new MethodModel(this.rgstrScope);
+                    let mModel = new MethodModel(this.accessModifiers);
                     this.fillMethodModel(mModel, combinedMethodLine, lstComments, iLine);
                     cModel.getMethods().push(mModel);
                     lstComments = [];
@@ -268,7 +268,7 @@ class ApexDoc {
                 ) {
 
                     // create the new class
-                    let cModelNew = new ClassModel(cModelParent, this.rgstrScope);
+                    let cModelNew = new ClassModel(cModelParent, this.accessModifiers);
                     this.fillClassModel(cModelNew, strLine, filePath, lstComments,  iLine);
                     lstComments = [];
 
@@ -296,7 +296,7 @@ class ApexDoc {
                         combinedMethodLine = strLine;
                         return;
                     }
-                    let mModel = new MethodModel(this.rgstrScope);
+                    let mModel = new MethodModel(this.accessModifiers);
                     this.fillMethodModel(mModel, strLine, lstComments, iLine);
                     cModel.getMethods().push(mModel);
                     lstComments = [];
@@ -315,7 +315,7 @@ class ApexDoc {
                 }
 
                 // must be a property
-                let propertyModel = new PropertyModel(this.rgstrScope);
+                let propertyModel = new PropertyModel(this.accessModifiers);
                 this.fillPropertyModel(propertyModel, strLine, lstComments, iLine);
                 cModel.getProperties().push(propertyModel);
                 lstComments = [];
@@ -331,9 +331,9 @@ class ApexDoc {
 
     strContainsScope(str) {
         str = str.toLowerCase();
-        for (let i = 0; i < this.rgstrScope.length; i++) {
-            if (str.toLowerCase().includes(this.rgstrScope[i].toLowerCase() + " ")) {
-                return this.rgstrScope[i];
+        for (let i = 0; i < this.accessModifiers.length; i++) {
+            if (str.toLowerCase().includes(this.accessModifiers[i].toLowerCase() + " ")) {
+                return this.accessModifiers[i];
             }
         }
         return null;

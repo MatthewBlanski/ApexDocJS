@@ -1,6 +1,6 @@
 class ApexModel {
-    constructor(rgstrScope) {
-        this.rgstrScope = rgstrScope;
+    constructor(accessModifiers) {
+        this.accessModifiers = accessModifiers;
     }
 
     getNameLine() {
@@ -87,9 +87,9 @@ class ApexModel {
 
     strContainsScope(str) {
         str = str.toLowerCase();
-        for (let i = 0; i < this.rgstrScope.length; i++) {
-            if (str.toLowerCase().includes(this.rgstrScope[i].toLowerCase() + " ")) {
-                return this.rgstrScope[i];
+        for (let i = 0; i < this.accessModifiers.length; i++) {
+            if (str.toLowerCase().includes(this.accessModifiers[i].toLowerCase() + " ")) {
+                return this.accessModifiers[i];
             }
         }
         return null;

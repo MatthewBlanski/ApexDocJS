@@ -2,8 +2,8 @@ const ApexModel = require('./apexModel.js');
 
 class PropertyModel extends ApexModel {
 
-    constructor(rgstrScope) {
-        super(rgstrScope);
+    constructor(accessModifiers) {
+        super(accessModifiers);
     }
 
     setNameLine(nameLine, iLine) {
