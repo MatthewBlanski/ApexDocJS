@@ -18,7 +18,6 @@
   "homepage": "https://github.com/MatthewBlanski/ApexDocJS#readme",
   "dependencies": {
     "escape-html": "^1.0.3",
-    "fs": "0.0.1-security",
-    "simple-git": "^2.17.0"
+    "simple-git": "^2.19.0"
   }
 }
