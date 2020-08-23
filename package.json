@@ -1,6 +1,6 @@
 {
   "name": "apexdocjs",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A node app to document Salesforce Apex classes.",
   "main": "index.js",
   "scripts": {
