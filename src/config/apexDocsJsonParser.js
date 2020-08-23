@@ -7,7 +7,14 @@ class ApexDocsJsonParser {
         this.apexDocsJsonFilePath = path.resolve(sourceDirectory,'apexdocs.json');
     }
 
+    apexDocsJsonExists() {
+        return fs.existsSync(this.apexDocsJsonFilePath);
+    }
+
     readApexDocsJson() {
+        if(!this.apexDocsJsonExists()) {
+            return;
+        }
         const file = fs.readFileSync(this.apexDocsJsonFilePath, {encoding:'utf8',flag:'r'});
         return file;
     }
