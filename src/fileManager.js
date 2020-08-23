@@ -15,7 +15,7 @@ class FileManager {
         this.accessModifiers = apexDocJsonParser.getAccessModifiers();
         this.path = apexDocJsonParser.getTargetDirectory();
         this.sourceDirectory = apexDocJsonParser.getSourceDirectory();
-        this.resourcesPath = apexDocJsonParser.getResourcesPath();
+        this.resourcesPath = apexDocJsonParser.getResourcesFolderPath();
 
         if (!this.path || this.path.trim().length === 0) {
             this.path = "./";
