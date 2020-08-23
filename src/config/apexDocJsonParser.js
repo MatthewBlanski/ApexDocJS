@@ -21,7 +21,7 @@ class ApexDocJSONParser {
         if(!this.apexDocJSON) {
             const rawJSON = this.readApexDocJSON();
             if(rawJSON) {
-                this.apexDocJSON = JSON.parse();
+                this.apexDocJSON = JSON.parse(rawJSON);
             } else {
                 this.apexDocJSON = {};
             }
