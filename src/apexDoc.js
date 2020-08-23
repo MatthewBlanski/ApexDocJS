@@ -21,7 +21,6 @@ class ApexDoc {
         const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
         this.packageDirectories = sfdxProjectJsonParser.getPackageDirectories();
 
-        this.apexParser = new ApexParser(apexDocJsonParser);
         this.fm = new FileManager(apexDocJsonParser);
     }
 
@@ -42,6 +41,7 @@ class ApexDoc {
 
     //TODO: Name this better
     mainLogic() {
+        this.apexParser = new ApexParser(this.accessModifiers,this.sourceDirectory);
         const filesArray = this.getClassFilesFromPackageDirectories();
 
         //Create a new array of ClassModels

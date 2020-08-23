@@ -5,8 +5,9 @@ const MethodModel = require('../apexmodels/methodModel.js');
 const PropertyModel = require('../apexmodels/propertyModel.js');
 
 class ApexParser {
-    constructor(apexDocJsonParser) {
-        this.accessModifiers = apexDocJsonParser.getAccessModifiers();
+    constructor(accessModifiers,sourceDirectory) {
+        this.accessModifiers = accessModifiers;
+        this.sourceDirectory = sourceDirectory;
     }
 
     parseFileContents(filePath) {
