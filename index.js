@@ -1,9 +1,9 @@
-const ApexDoc = require('./src/apexDoc');
-const ApexDocsJsonParser = require('./src/config/apexDocsJsonParser');
+const ApexDoc = require('./src/apexDoc.js');
+const ApexDocJsonParser = require('./src/config/apexDocJsonParser.js');
 
 if(!process.argv[2]) {
     console.log('You have to provide a path to the repo!')
 }
-const apexDocsJsonParser = new ApexDocsJsonParser(process.argv[2]);
-const apexDocEngine = new ApexDoc(apexDocsJsonParser);
-apexDocEngine.runApexDocs();
+const apexDocJsonParser = new ApexDocJsonParser(process.argv[2]);
+const apexDocEngine = new ApexDoc(apexDocJsonParser);
+apexDocEngine.runApexDoc();
