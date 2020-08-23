@@ -3,7 +3,6 @@ const path = require('path');
 
 const SFDXProjectJsonParser = require('./config/sfdxProjectJsonParser.js');
 
-const simpleGit = require('simple-git');
 const GitService = require('./gitservices/gitService.js')
 
 const ApexParser = require('./apexParsing/ApexParser.js');
