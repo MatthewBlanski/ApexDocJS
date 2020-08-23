@@ -10,22 +10,22 @@ const ClassGroup = require('./classGroup.js');
 const FileManager = require('./fileManager.js');
 
 class ApexDoc {
-    constructor(apexDocsJsonParser) {
-        this.accessModifiers = apexDocsJsonParser.getAccessModifiers();
-        this.bannerFilePath = apexDocsJsonParser.getBannerFilePath();
-        this.homefilepath = apexDocsJsonParser.getHomeFilePath();
-        this.mainBranch = apexDocsJsonParser.getMainBranch();
-        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
-        this.targetDirectory = apexDocsJsonParser.getTargetDirectory();
+    constructor(apexDocJsonParser) {
+        this.accessModifiers = apexDocJsonParser.getAccessModifiers();
+        this.bannerFilePath = apexDocJsonParser.getBannerFilePath();
+        this.homefilepath = apexDocJsonParser.getHomeFilePath();
+        this.mainBranch = apexDocJsonParser.getMainBranch();
+        this.sourceDirectory = apexDocJsonParser.getSourceDirectory();
+        this.targetDirectory = apexDocJsonParser.getTargetDirectory();
 
         const sfdxProjectJsonParser = new SFDXProjectJsonParser(this.sourceDirectory);
         this.packageDirectories = sfdxProjectJsonParser.getPackageDirectories();
 
-        this.apexParser = new ApexParser(apexDocsJsonParser);
-        this.fm = new FileManager(apexDocsJsonParser);
+        this.apexParser = new ApexParser(apexDocJsonParser);
+        this.fm = new FileManager(apexDocJsonParser);
     }
 
-    runApexDocs() {
+    runApexDoc() {
         const gitService = new GitService(
             this.sourceDirectory,
             this.mainBranch

@@ -8,14 +8,14 @@ const ClassGroup = require('./classGroup');
 
 class FileManager {
 
-    constructor(apexDocsJsonParser) {
+    constructor(apexDocJsonParser) {
         this.header = "";
         this.APEX_DOC_PATH = "";
 
-        this.accessModifiers = apexDocsJsonParser.getAccessModifiers();
-        this.path = apexDocsJsonParser.getTargetDirectory();
-        this.sourceDirectory = apexDocsJsonParser.getSourceDirectory();
-        this.resourcesPath = apexDocsJsonParser.getResourcesPath();
+        this.accessModifiers = apexDocJsonParser.getAccessModifiers();
+        this.path = apexDocJsonParser.getTargetDirectory();
+        this.sourceDirectory = apexDocJsonParser.getSourceDirectory();
+        this.resourcesPath = apexDocJsonParser.getResourcesPath();
 
         if (!this.path || this.path.trim().length === 0) {
             this.path = "./";
