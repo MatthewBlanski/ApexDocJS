@@ -12,6 +12,8 @@ class StringUtils {
     }
 
     /**
+     * @summary
+     * Returns the previous word just before a given index in a string.
      * 
      * @param {string} str 
      * @param {number} iSearch 
@@ -34,6 +36,9 @@ class StringUtils {
     }
 
     /**
+     * @summary
+     * Fairly obvious, counts the number of times a character occurs
+     * in a string.
      * 
      * @param {string} str 
      * @param {string} ch 
