@@ -47,7 +47,8 @@ The parameters for the JSON file are as follows:
 
 ## Usage
 
-Pull down the repo to your local machine. Run node.js against index.js, adding your repo's file path as an argument
+To use this application, click [here](https://github.com/MatthewBlanski/ApexDocJS/releases) and download the latest release to your local machine.
+Extract the source code and then run node.js against index.js, adding your repo's file path as an argument.
 
 For example
 ```node index.js /path/to/my/repo```
