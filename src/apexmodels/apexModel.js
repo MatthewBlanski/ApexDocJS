@@ -72,22 +72,12 @@ class ApexModel {
         this.scope = null;
 
         if(this.nameLine) {
-            let str = this.strContainsScope(this.nameLine);
+            let str = this.stringUtils.getMatchingSubstring(this.nameLine, this.accessModifiers);
             if (str) {
                 this.scope = str;
             }
             this.scope = this.nameLine;
         }
-    }
-
-    strContainsScope(str) {
-        str = str.toLowerCase();
-        for (let i = 0; i < this.accessModifiers.length; i++) {
-            if (str.toLowerCase().includes(this.accessModifiers[i].toLowerCase() + " ")) {
-                return this.accessModifiers[i];
-            }
-        }
-        return null;
     }
 }
 

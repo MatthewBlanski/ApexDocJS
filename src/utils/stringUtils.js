@@ -32,6 +32,40 @@ class StringUtils {
 
         return iStart < 0 ? null : str.substring(iStart, iEnd);
     }
+
+    /**
+     * 
+     * @param {string} str 
+     * @param {string} ch 
+     */
+    countChars(str, ch) {
+        let count = 0;
+        for (let i = 0; i < str.length; ++i) {
+            if (str.charAt(i) === ch) {
+                ++count;
+            }
+        }
+        return count;
+    }
+
+    /**
+     * @summary
+     * Does a case-insensitive match to check if any of the options exist
+     * in the original string. It returns the string that exists, if any.
+     * Otherwise it returns null.
+     * 
+     * @param {string} str 
+     * @param {string[]} options 
+     */
+    getMatchingSubstring(str, options) {
+        const s = str.toLowerCase();
+        for (let i = 0; i < options.length; i++) {
+            if (s.includes(options[i].toLowerCase() + " ")) {
+                return options[i];
+            }
+        }
+        return null;
+    }
 }
 
 module.exports = StringUtils;
