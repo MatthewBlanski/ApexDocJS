@@ -417,32 +417,6 @@ class ApexParser {
         });
     }
 
-    strPrevWord(str, iSearch) {
-        if (!str || iSearch >= str.length) {
-            return null;
-        }
-
-        let iStart;
-        let iEnd = 0;
-        for (iStart = iSearch - 1; iStart >= 0; iStart--) {
-            if (iEnd === 0) {
-                if (str.charAt(iStart) === ' ') {
-                    continue;
-                }
-                iEnd = iStart + 1;
-            } else if (str.charAt(iStart) === ' ') {
-                iStart++;
-                break;
-            }
-        }
-
-        if (iStart === -1) {
-            return null;
-        } else {
-            return str.substring(iStart, iEnd);
-        }
-    }
-
     countChars(str, ch) {
         let count = 0;
         for (let i = 0; i < str.length; ++i) {
