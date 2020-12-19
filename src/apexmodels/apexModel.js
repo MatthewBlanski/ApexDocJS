@@ -1,6 +1,9 @@
+const StringUtils = require('../utils/stringUtils');
+
 class ApexModel {
     constructor(accessModifiers) {
         this.accessModifiers = accessModifiers;
+        this.stringUtils = new StringUtils();
     }
 
     getNameLine() {
@@ -18,7 +21,7 @@ class ApexModel {
     }
 
     getDescription() {
-        return this.getValueOrEmptyString(this.description);
+        return this.stringUtils.getValueOrEmptyString(this.description);
     }
 
     setDescription(description) {
@@ -26,7 +29,7 @@ class ApexModel {
     }
 
     getAuthor() {
-        return this.getValueOrEmptyString(this.author);
+        return this.stringUtils.getValueOrEmptyString(this.author);
     }
 
     setAuthor(author) {
@@ -34,7 +37,7 @@ class ApexModel {
     }
 
     getDate() {
-        return this.getValueOrEmptyString(this.date);
+        return this.stringUtils.getValueOrEmptyString(this.date);
     }
 
     setDate(date) {
@@ -42,7 +45,7 @@ class ApexModel {
     }
 
     getReturns() {
-        return this.getValueOrEmptyString(this.returns);
+        return this.stringUtils.getValueOrEmptyString(this.returns);
     }
 
     setReturns(returns) {
@@ -50,7 +53,7 @@ class ApexModel {
     }
 
     getExample() {
-        return this.getValueOrEmptyString(this.example);
+        return this.stringUtils.getValueOrEmptyString(this.example);
     }
 
     setExample(example) {
@@ -58,41 +61,23 @@ class ApexModel {
     }
 
     getScope() {
-        return this.getValueOrEmptyString(this.scope);
+        return this.stringUtils.getValueOrEmptyString(this.scope);
     }
 
     setScope(scope) {
         this.scope = scope;
     }
 
-    getValueOrEmptyString(value) {
-        if(!value) {
-            return '';
-        }
-
-        return value;
-    }
-
     parseScope() {
         this.scope = null;
 
         if(this.nameLine) {
-            let str = this.strContainsScope(this.nameLine);
+            let str = this.stringUtils.getMatchingSubstring(this.nameLine, this.accessModifiers);
             if (str) {
                 this.scope = str;
             }
             this.scope = this.nameLine;
         }
-    }
-
-    strContainsScope(str) {
-        str = str.toLowerCase();
-        for (let i = 0; i < this.accessModifiers.length; i++) {
-            if (str.toLowerCase().includes(this.accessModifiers[i].toLowerCase() + " ")) {
-                return this.accessModifiers[i];
-            }
-        }
-        return null;
     }
 }
 
