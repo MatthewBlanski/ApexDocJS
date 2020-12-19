@@ -1,11 +1,15 @@
 # ApexDocJS
+
 ApexDocJs is a node js app that you can use to document your Salesforce Apex classes. You tell ApexDoc where your local repo is and it will generate a set of static HTML pages that fully document each class, including its properties and methods. Each static HTML page will include an expandable menu on its left hand side, that shows a 2-level tree structure of all of your classes. An apexdoc JSON file at the root directory of the repo allows you to control many aspects of ApexDocJS.
 
-# Credits
+## Credits
+
 ApexDoc was originally created by [Aslam Bari](http://techsahre.blogspot.com/2011/01/apexdoc-salesforce-code-documentation.html). It was then taken and extended by David Habib, at Groundwire, in 2011. It has subsequently been enhanced by David Habib of the [Salesforce Foundation](https://github.com/SalesforceFoundation/ApexDoc) in late 2014 for use with [Nonprofit Success Pack](https://github.com/SalesforceFoundation/NPSP). Matthew Blanski of Salesforce then ported it over to Node.js as ApexDocJS.
 
-# Configuration
-## Command Line Parameter
+## Configuration
+
+### Command Line Parameter
+
 The only parameter that ApexDocJs takes from the command line is the path to the local repo.
 
 |parameter|description|
@@ -15,9 +19,11 @@ The only parameter that ApexDocJs takes from the command line is the path to the
 For example
 ```node index.js /path/to/my/repo```
 
-# ApexDoc Json
+## ApexDoc Json
+
 If your repo has a file named ```apexdoc.json``` in its root directory, you are able to provide additional configuration. An example file with its default values is as follows:
-```
+
+```json
 {
     "accessModifiers":["global","public","webService"],
     "bannerFilePath":"",
@@ -39,16 +45,20 @@ The parameters for the JSON file are as follows:
 |resourcesFolderPath|The full path to the folder that contains supporting javascript and images to copy over. Optional.|
 |targetDirectory|The folder location in the repo where documentation will be generated to. Optional.|
 
-# Usage
-Pull down the repo to your local machine. Run node.js against index.js, adding your repo's file path as an argument
+## Usage
+
+To use this application, click [here](https://github.com/MatthewBlanski/ApexDocJS/releases) and download the latest release to your local machine.
+Extract the source code and then run node.js against index.js, adding your repo's file path as an argument.
 
 For example
 ```node index.js /path/to/my/repo```
 
-# Documenting Class Files
+## Documenting Class Files
+
 ApexDocJS scans each class file, and looks for comment blocks with special keywords to identify the documentation to include for a given class, property, or method. The comment blocks must always begin with /** (or additional *'s) and can cover multiple lines. Each line must start with * (or whitespace and then *). The comment block ends with */. Special tokens are called out with @token.
 
-## Class Comments
+### Class Comments
+
 Located in the lines above the class declaration. The special tokens are all optional.
 
 |token|description|
@@ -60,7 +70,8 @@ Located in the lines above the class declaration. The special tokens are all opt
 |@description|one or more lines that provide an overview of the class|
 
 Example
-```
+
+```js
 /**
 * @author Salesforce.com Foundation
 * @date 2014
@@ -75,7 +86,8 @@ Example
 public with sharing class ACCT_Accounts_TDTM extends TDTM_Runnable {
 ```
 
-## Property Comments
+### Property Comments
+
 Located in the lines above a property. The special tokens are all optional.
 
 |token|description|
@@ -83,7 +95,8 @@ Located in the lines above a property. The special tokens are all optional.
 |@description|one or more lines that describe the property|
 
 Example
-```
+
+```js
     /*******************************************************************************************************
     * @description specifies whether state and country picklists are enabled in this org.
     * returns true if enabled.
@@ -91,18 +104,21 @@ Example
     public static Boolean isStateCountryPicklistsEnabled {
         get {
 ```
-## Method Comments
+
+### Method Comments
+
 In order for ApexDoc to identify class methods, the method line must contain an explicit scope (global, public, private, testMethod, webService). The comment block is located in the lines above a method. The special tokens are all optional.
 
 |token|description|
 |-----|-----------|
 |@description|one or more lines that provide an overview of the method|
-|@param|param name	a description of what the parameter does|
+|@param|param name a description of what the parameter does|
 |@return|a description of the return value from the method|
 |@example|Example code usage. This will be wrapped in tags to preserve whitespace|
 
 Example
-```
+
+```js
     /*******************************************************************************************************
     * @description Returns field describe data
     * @param objectName the name of the object to look up
