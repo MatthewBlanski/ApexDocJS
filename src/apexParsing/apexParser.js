@@ -3,11 +3,13 @@ const fs = require('fs');
 const ClassModel = require('../apexmodels/classModel.js');
 const MethodModel = require('../apexmodels/methodModel.js');
 const PropertyModel = require('../apexmodels/propertyModel.js');
+const StringUtils = require('../utils/stringUtils');
 
 class ApexParser {
     constructor(accessModifiers,sourceDirectory) {
         this.accessModifiers = accessModifiers;
         this.sourceDirectory = sourceDirectory;
+        this.stringUtils = new StringUtils();
     }
 
     parseFileContents(filePath) {
@@ -93,8 +95,8 @@ class ApexParser {
                 }
 
                 // keep track of our nesting so we know which class we are in
-                let openCurlies = this.countChars(strLine, '{');
-                let closeCurlies = this.countChars(strLine, '}');
+                let openCurlies = this.stringUtils.countChars(strLine, '{');
+                let closeCurlies = this.stringUtils.countChars(strLine, '}');
                 nestedCurlyBraceDepth += openCurlies;
                 nestedCurlyBraceDepth -= closeCurlies;
 
@@ -123,7 +125,7 @@ class ApexParser {
                 }
 
                 // ignore lines not dealing with scope
-                if (!this.strContainsScope(strLine) &&
+                if (!this.stringUtils.getMatchingSubstring(strLine, this.accessModifiers) &&
                         // interface methods don't have scope
                     !(cModel &&
                         cModel.getIsInterface()
@@ -415,52 +417,6 @@ class ApexParser {
                 return;
             }
         });
-    }
-
-    strPrevWord(str, iSearch) {
-        if (!str || iSearch >= str.length) {
-            return null;
-        }
-
-        let iStart;
-        let iEnd = 0;
-        for (iStart = iSearch - 1; iStart >= 0; iStart--) {
-            if (iEnd === 0) {
-                if (str.charAt(iStart) === ' ') {
-                    continue;
-                }
-                iEnd = iStart + 1;
-            } else if (str.charAt(iStart) === ' ') {
-                iStart++;
-                break;
-            }
-        }
-
-        if (iStart === -1) {
-            return null;
-        } else {
-            return str.substring(iStart, iEnd);
-        }
-    }
-
-    countChars(str, ch) {
-        let count = 0;
-        for (let i = 0; i < str.length; ++i) {
-            if (str.charAt(i) === ch) {
-                ++count;
-            }
-        }
-        return count;
-    }
-
-    strContainsScope(str) {
-        str = str.toLowerCase();
-        for (let i = 0; i < this.accessModifiers.length; i++) {
-            if (str.toLowerCase().includes(this.accessModifiers[i].toLowerCase() + " ")) {
-                return this.accessModifiers[i];
-            }
-        }
-        return null;
     }
 }
 
